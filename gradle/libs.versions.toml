@@ -51,6 +51,10 @@ module = "com.inkapplications.regolith:processes"
 version.ref = "regolith"
 module = "com.inkapplications.regolith:resources"
 
+[libraries.ink-ui-structures]
+version.ref = "ink-ui"
+module = "com.inkapplications.ui:structures"
+
 [libraries.core-ktx]
 version.ref = "core-ktx"
 group = "androidx.core"
@@ -82,6 +86,10 @@ module = "androidx.compose.foundation:foundation"
 [libraries.androidx-appcompat]
 version = "1.6.1"
 module = "androidx.appcompat:appcompat"
+
+[libraries.sunrisesunsetcalculator]
+version = "1.2"
+module = "com.luckycatlabs:SunriseSunsetCalculator"
 
 [bundles]
 androidx = ["androidx-appcompat", "core-ktx", "lifecycle-runtime-ktx", "activity-compose"]
