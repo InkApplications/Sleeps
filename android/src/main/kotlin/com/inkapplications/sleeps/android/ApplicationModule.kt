@@ -1,14 +1,20 @@
 package com.inkapplications.sleeps.android
 
+import android.app.Activity
+import android.location.LocationManager
 import com.inkapplications.sleeps.state.createJvmStateModule
-import com.inkapplications.sleeps.state.location.LocationProvider
 
-object ApplicationModule {
-    private val module = createJvmStateModule(
-        locationProvider = object : LocationProvider {
-            override suspend fun getLastLocation() = null
-        }
+class ApplicationModule(
+    activity: MainActivity,
+) {
+    val locationProvider = AndroidLocationProvider(
+        locationManager = activity.getSystemService(Activity.LOCATION_SERVICE) as LocationManager,
+        activity = activity,
     )
 
-    val screenState = module.screenState
+    val stateModule = createJvmStateModule(
+        locationProvider = locationProvider,
+    )
+
+    val screenState = stateModule.screenState
 }

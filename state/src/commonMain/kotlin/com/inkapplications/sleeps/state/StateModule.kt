@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 
 class StateModule(
     locationProvider: LocationProvider,
@@ -20,19 +19,12 @@ class StateModule(
     clock: Clock = Clock.System,
     timeZone: TimeZone = TimeZone.currentSystemDefault()
 ) {
-    private val locationUpdates = flow {
-        while (currentCoroutineContext().isActive) {
-            emit(locationProvider.getLastLocation())
-            delay(5.minutes)
-        }
-    }
-
     private val sunStateProvider = SunStateProvider(
         sunScheduleProvider = sunScheduleProvider,
         clock = clock,
         timeZone = timeZone,
         stateScope = stateScope,
-        locationUpdates = locationUpdates,
+        locationProvider = locationProvider,
     )
 
     private val waiter = flow {

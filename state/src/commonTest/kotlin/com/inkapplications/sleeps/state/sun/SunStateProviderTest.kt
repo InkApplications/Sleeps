@@ -1,5 +1,7 @@
 package com.inkapplications.sleeps.state.sun
 
+import com.inkapplications.sleeps.state.location.DummyLocationProvider
+import com.inkapplications.sleeps.state.location.FakeLocationProvider
 import inkapplications.spondee.spatial.GeoCoordinates
 import inkapplications.spondee.spatial.latitude
 import inkapplications.spondee.spatial.longitude
@@ -24,7 +26,7 @@ class SunStateProviderTest {
             },
             timeZone = TimeZone.UTC,
             stateScope = backgroundScope,
-            locationUpdates = flow { },
+            locationProvider = DummyLocationProvider,
         )
 
         assertEquals(SunScheduleState.Initial, provider.sunState.value)
@@ -41,7 +43,7 @@ class SunStateProviderTest {
             },
             timeZone = TimeZone.UTC,
             stateScope = backgroundScope,
-            locationUpdates = flow { emit(null) },
+            locationProvider = FakeLocationProvider(null),
         )
 
         val results = provider.sunState.take(2).toList()
@@ -65,7 +67,7 @@ class SunStateProviderTest {
             },
             timeZone = TimeZone.UTC,
             stateScope = backgroundScope,
-            locationUpdates = flow { emit(GeoCoordinates(123.latitude, (456).longitude)) },
+            locationProvider = FakeLocationProvider(GeoCoordinates(123.latitude, (456).longitude)),
         )
 
         val results = provider.sunState.take(2).toList()

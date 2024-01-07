@@ -1,8 +1,7 @@
 package com.inkapplications.sleeps.state.sun
 
-import inkapplications.spondee.spatial.GeoCoordinates
+import com.inkapplications.sleeps.state.location.LocationProvider
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -15,12 +14,12 @@ import kotlinx.datetime.toLocalDateTime
  */
 internal class SunStateProvider(
     sunScheduleProvider: SunScheduleProvider,
-    locationUpdates: Flow<GeoCoordinates?>,
+    locationProvider: LocationProvider,
     clock: Clock,
     timeZone: TimeZone,
     stateScope: CoroutineScope,
 ) {
-    val sunState = locationUpdates
+    val sunState = locationProvider.location
         .map { it?.let { location ->
             sunScheduleProvider.getScheduleForLocation(
                 coordinates = location,
