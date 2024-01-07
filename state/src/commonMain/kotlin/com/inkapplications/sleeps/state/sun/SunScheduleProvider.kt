@@ -4,7 +4,7 @@ import inkapplications.spondee.spatial.GeoCoordinates
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 
-internal interface SunScheduleProvider {
+interface SunScheduleProvider {
     fun getScheduleForLocation(
         coordinates: GeoCoordinates,
         date: LocalDate,

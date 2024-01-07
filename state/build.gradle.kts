@@ -9,7 +9,9 @@ kotlin {
                 implementation(libs.coroutines.core)
                 implementation(libs.ink.regolith.init)
                 implementation(libs.ink.regolith.processes)
-                implementation(libs.ink.spondee.units)
+                api(libs.ink.ui.structures)
+                api(libs.ink.spondee.units)
+                api(libs.kotlinx.datetime)
             }
         }
 
