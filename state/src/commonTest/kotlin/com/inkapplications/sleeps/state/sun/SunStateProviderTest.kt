@@ -1,5 +1,7 @@
 package com.inkapplications.sleeps.state.sun
 
+import com.inkapplications.datetime.ZonedDate
+import com.inkapplications.datetime.atZone
 import com.inkapplications.sleeps.state.location.DummyLocationProvider
 import com.inkapplications.sleeps.state.location.FakeLocationProvider
 import inkapplications.spondee.spatial.GeoCoordinates
@@ -19,12 +21,11 @@ class SunStateProviderTest {
     fun initial() = runTest {
         val provider = SunStateProvider(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: LocalDate, timeZone: TimeZone): SunSchedule { TODO() }
+                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: ZonedDate): SunSchedule { TODO() }
             },
             clock = object: Clock {
                 override fun now(): Instant = Instant.fromEpochMilliseconds(123)
-            },
-            timeZone = TimeZone.UTC,
+            }.atZone(TimeZone.UTC),
             stateScope = backgroundScope,
             locationProvider = DummyLocationProvider,
         )
@@ -36,12 +37,11 @@ class SunStateProviderTest {
     fun nullLocation() = runTest {
         val provider = SunStateProvider(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: LocalDate, timeZone: TimeZone): SunSchedule { TODO() }
+                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: ZonedDate): SunSchedule { TODO() }
             },
             clock = object: Clock {
                 override fun now(): Instant = Instant.fromEpochMilliseconds(123)
-            },
-            timeZone = TimeZone.UTC,
+            }.atZone(TimeZone.UTC),
             stateScope = backgroundScope,
             locationProvider = FakeLocationProvider(null),
         )
@@ -55,17 +55,15 @@ class SunStateProviderTest {
     fun knownLocation() = runTest {
         val provider = SunStateProvider(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: LocalDate, timeZone: TimeZone): SunSchedule {
+                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: ZonedDate): SunSchedule {
                     return SunSchedule(
-                        sunrise = LocalTime(1, 2, 3),
-                        sunset = LocalTime(4, 5, 6),
+                        sunrise = LocalTime(1, 2, 3).atZone(date.zone),
                     )
                 }
             },
             clock = object: Clock {
                 override fun now(): Instant = Instant.fromEpochMilliseconds(123)
-            },
-            timeZone = TimeZone.UTC,
+            }.atZone(TimeZone.UTC),
             stateScope = backgroundScope,
             locationProvider = FakeLocationProvider(GeoCoordinates(123.latitude, (456).longitude)),
         )
@@ -74,7 +72,9 @@ class SunStateProviderTest {
         assertEquals(SunScheduleState.Initial, results[0])
         val knownResult = results[1]
         assertTrue(knownResult is SunScheduleState.Known)
-        assertEquals(LocalTime(1, 2, 3), knownResult.schedule.sunrise)
-        assertEquals(LocalTime(4, 5, 6), knownResult.schedule.sunset)
+        assertEquals(1, knownResult.schedule.sunrise.hour)
+        assertEquals(2, knownResult.schedule.sunrise.minute)
+        assertEquals(3, knownResult.schedule.sunrise.second)
+        assertEquals(TimeZone.UTC, knownResult.schedule.sunrise.zone)
     }
 }

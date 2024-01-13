@@ -1,8 +1,7 @@
 package com.inkapplications.sleeps.state.sun
 
-import kotlinx.datetime.LocalTime
+import com.inkapplications.datetime.ZonedTime
 
 data class SunSchedule(
-    val sunrise: LocalTime,
-    val sunset: LocalTime,
+    val sunrise: ZonedTime,
 )

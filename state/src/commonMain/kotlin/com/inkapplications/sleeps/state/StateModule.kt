@@ -1,5 +1,6 @@
 package com.inkapplications.sleeps.state
 
+import com.inkapplications.datetime.atZone
 import com.inkapplications.sleeps.state.location.LocationProvider
 import com.inkapplications.sleeps.state.notifications.NotificationStateAccess
 import com.inkapplications.sleeps.state.sun.SunScheduleProvider
@@ -22,8 +23,7 @@ class StateModule(
 ) {
     private val sunStateProvider = SunStateProvider(
         sunScheduleProvider = sunScheduleProvider,
-        clock = clock,
-        timeZone = timeZone,
+        clock = clock.atZone(TimeZone.UTC),
         stateScope = stateScope,
         locationProvider = locationProvider,
     )

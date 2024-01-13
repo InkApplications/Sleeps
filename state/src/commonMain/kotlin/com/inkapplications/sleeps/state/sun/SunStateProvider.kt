@@ -1,13 +1,11 @@
 package com.inkapplications.sleeps.state.sun
 
+import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.location.LocationProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 /**
  * Uses the current location to provide the sunrise and sunset times.
@@ -15,16 +13,14 @@ import kotlinx.datetime.toLocalDateTime
 internal class SunStateProvider(
     sunScheduleProvider: SunScheduleProvider,
     locationProvider: LocationProvider,
-    clock: Clock,
-    timeZone: TimeZone,
+    clock: ZonedClock,
     stateScope: CoroutineScope,
 ) {
     val sunState = locationProvider.location
         .map { it?.let { location ->
             sunScheduleProvider.getScheduleForLocation(
                 coordinates = location,
-                date = clock.now().toLocalDateTime(timeZone).date,
-                timeZone = timeZone
+                date = clock.zonedDate(),
             )
         }}
         .map {

@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.8.22"
+kotlin = "1.9.21"
 coroutines = "1.7.3"
 core-ktx = "1.9.0"
 lifecycle-runtime-ktx = "2.6.1"
@@ -63,6 +63,10 @@ module = "com.inkapplications.ui:render-compose"
 [libraries.ink-spondee-units]
 version = "1.4.0"
 module = "com.inkapplications.spondee:units"
+
+[libraries.ink-watermelon-datetime]
+version = "1.4.0"
+module = "com.inkapplications.watermelon:datetime"
 
 [libraries.core-ktx]
 version.ref = "core-ktx"
