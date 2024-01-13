@@ -1,6 +1,6 @@
 package com.inkapplications.sleeps.state
 
-import com.inkapplications.datetime.atZone
+import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.location.LocationProvider
 import com.inkapplications.sleeps.state.notifications.NotificationStateAccess
 import com.inkapplications.sleeps.state.sun.SunScheduleProvider
@@ -10,20 +10,17 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
 import kotlin.time.Duration.Companion.milliseconds
 
 class StateModule(
     locationProvider: LocationProvider,
     sunScheduleProvider: SunScheduleProvider,
     stateScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    clock: Clock = Clock.System,
-    timeZone: TimeZone = TimeZone.currentSystemDefault()
+    clock: ZonedClock = ZonedClock.System,
 ) {
     private val sunStateProvider = SunStateProvider(
         sunScheduleProvider = sunScheduleProvider,
-        clock = clock.atZone(TimeZone.UTC),
+        clock = clock,
         stateScope = stateScope,
         locationProvider = locationProvider,
     )
