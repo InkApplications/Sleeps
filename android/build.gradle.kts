@@ -73,5 +73,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.ink.ui.compose)
+    implementation(libs.ink.watermelon.android)
+    implementation(libs.kimchi.core)
     implementation(projects.state)
 }

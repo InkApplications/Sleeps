@@ -2,7 +2,7 @@ package com.inkapplications.sleeps.android
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.minutes
 @OptIn(ExperimentalCoroutinesApi::class)
 class AndroidLocationProvider(
     private val locationManager: LocationManager,
-    private val activity: Activity,
+    private val context: Context,
 ): LocationProvider {
     private val permissionsChannel = MutableStateFlow(checkPermissions())
 
@@ -85,7 +85,7 @@ class AndroidLocationProvider(
 
     private fun checkPermissions(): Boolean {
         return ActivityCompat.checkSelfPermission(
-            activity,
+            context,
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
