@@ -16,9 +16,11 @@ internal class AlarmScheduler(
     private val clock: ZonedClock,
     private val logger: KimchiLogger,
 ): Initializer {
+    private val wakeAlarm = AlarmId("wake")
+
     override suspend fun initialize(targetManager: TargetManager) {
         logger.trace("Initializing Alarms")
         val time = clock.now().plus(10.seconds)
-        alarmAccess.addAlarm(time)
+        alarmAccess.addAlarm(wakeAlarm, time)
     }
 }

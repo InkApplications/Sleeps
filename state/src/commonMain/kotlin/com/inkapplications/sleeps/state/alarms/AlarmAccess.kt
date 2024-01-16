@@ -9,10 +9,5 @@ interface AlarmAccess {
     /**
      * Add a new alarm to be invoked at the given [time].
      */
-    fun addAlarm(time: Instant)
-
-    /**
-     * Clear all set alarms.
-     */
-    fun clear()
+    fun addAlarm(id: AlarmId, time: Instant)
 }

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import com.inkapplications.sleeps.android.SleepApplication
+import com.inkapplications.sleeps.state.alarms.AlarmId
 import kimchi.Kimchi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ private const val NotificationId = 3893
 private const val StopServiceIntentId = 28759
 private const val StopAction = "alarm.stop"
 private const val StartAction = "alarm.start"
+private const val AlarmIdExtra = "alarm.id"
 
 /**
  * Service used for running ongoing alarms.
@@ -21,11 +23,13 @@ private const val StartAction = "alarm.start"
 class AlarmService: Service() {
     private var job: Job? = Job()
 
+    private val Intent.alarmId get() = getStringExtra(AlarmIdExtra)!!.let(::AlarmId)
+
     override fun onBind(intent: Intent): IBinder? = null
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         when (intent.action) {
-            StartAction -> start()
+            StartAction -> start(intent.alarmId)
             StopAction -> stopSelf()
             else -> Kimchi.error("Unknown Alarm Service Action: ${intent.action}")
         }
@@ -33,12 +37,12 @@ class AlarmService: Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun start() = with (SleepApplication.module) {
+    private fun start(alarmId: AlarmId) = with (SleepApplication.module) {
         job?.cancel()
         startForeground(NotificationId, notifications.createAlarmNotification())
         job = backgroundScope.launch {
             beeper.prepare()
-            alarmExecutor.onStartAlarm()
+            alarmExecutor.onStartAlarm(alarmId)
         }
     }
 
@@ -64,6 +68,9 @@ fun Context.createStopAlarmServicePendingIntent(): PendingIntent = PendingIntent
 /**
  * Create an intent that can be used to start the alarm service.
  */
-fun Context.createStartAlarmServiceIntent(): Intent = Intent(this, AlarmService::class.java).apply {
+fun Context.createStartAlarmServiceIntent(
+    id: AlarmId,
+): Intent = Intent(this, AlarmService::class.java).apply {
     action = StartAction
+    putExtra(AlarmIdExtra, id.value)
 }
