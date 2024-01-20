@@ -1,6 +1,7 @@
 package com.inkapplications.sleeps.state.sun
 
 import com.inkapplications.datetime.ZonedDate
+import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
 import com.inkapplications.sleeps.state.location.DummyLocationProvider
 import com.inkapplications.sleeps.state.location.FakeLocationProvider
@@ -16,7 +17,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.hours
 
-class SunStateProviderTest {
+class LocationSunScheduleStateAccessProviderTest {
     private val testDateTime = LocalTime(1, 2, 3).atDate(2004, 5, 6)
     private val testClock = object: Clock {
         override fun now(): Instant = testDateTime.atZone(TimeZone.UTC).minus(1.hours).instant
@@ -24,9 +25,9 @@ class SunStateProviderTest {
 
     @Test
     fun initial() = runTest {
-        val provider = SunStateProvider(
+        val provider = LocationSunState(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: ZonedDate): SunSchedule { TODO() }
+                override fun getSunriseForLocation(coordinates: GeoCoordinates, date: ZonedDate): ZonedDateTime { TODO() }
             },
             clock = testClock,
             stateScope = backgroundScope,
@@ -38,12 +39,10 @@ class SunStateProviderTest {
 
     @Test
     fun nullLocation() = runTest {
-        val provider = SunStateProvider(
+        val provider = LocationSunState(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: ZonedDate): SunSchedule {
-                    return SunSchedule(
-                        sunrise = testDateTime.atZone(date.zone),
-                    )
+                override fun getSunriseForLocation(coordinates: GeoCoordinates, date: ZonedDate): ZonedDateTime {
+                    return testDateTime.atZone(date.zone)
                 }
             },
             clock = testClock,
@@ -55,22 +54,20 @@ class SunStateProviderTest {
         assertEquals(SunScheduleState.Initial, results[0])
         val unknownResult = results[1]
         assertTrue(unknownResult is SunScheduleState.Unknown)
-        assertEquals(1, unknownResult.centralUs.sunrise.hour)
-        assertEquals(2, unknownResult.centralUs.sunrise.minute)
-        assertEquals(3, unknownResult.centralUs.sunrise.second)
-        assertEquals(2004, unknownResult.centralUs.sunrise.year)
-        assertEquals(5, unknownResult.centralUs.sunrise.monthNumber)
-        assertEquals(6, unknownResult.centralUs.sunrise.dayOfMonth)
+        assertEquals(1, unknownResult.centralUsSunrise.hour)
+        assertEquals(2, unknownResult.centralUsSunrise.minute)
+        assertEquals(3, unknownResult.centralUsSunrise.second)
+        assertEquals(2004, unknownResult.centralUsSunrise.year)
+        assertEquals(5, unknownResult.centralUsSunrise.monthNumber)
+        assertEquals(6, unknownResult.centralUsSunrise.dayOfMonth)
     }
 
     @Test
     fun knownLocation() = runTest {
-        val provider = SunStateProvider(
+        val provider = LocationSunState(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getScheduleForLocation(coordinates: GeoCoordinates, date: ZonedDate): SunSchedule {
-                    return SunSchedule(
-                        sunrise = testDateTime.atZone(date.zone),
-                    )
+                override fun getSunriseForLocation(coordinates: GeoCoordinates, date: ZonedDate): ZonedDateTime {
+                    return testDateTime.atZone(date.zone)
                 }
             },
             clock = testClock,
@@ -82,12 +79,12 @@ class SunStateProviderTest {
         assertEquals(SunScheduleState.Initial, results[0])
         val knownResult = results[1]
         assertTrue(knownResult is SunScheduleState.Known)
-        assertEquals(1, knownResult.schedule.sunrise.hour)
-        assertEquals(2, knownResult.schedule.sunrise.minute)
-        assertEquals(3, knownResult.schedule.sunrise.second)
-        assertEquals(2004, knownResult.schedule.sunrise.year)
-        assertEquals(5, knownResult.schedule.sunrise.monthNumber)
-        assertEquals(6, knownResult.schedule.sunrise.dayOfMonth)
-        assertEquals(TimeZone.UTC, knownResult.schedule.sunrise.zone)
+        assertEquals(1, knownResult.sunrise.hour)
+        assertEquals(2, knownResult.sunrise.minute)
+        assertEquals(3, knownResult.sunrise.second)
+        assertEquals(2004, knownResult.sunrise.year)
+        assertEquals(5, knownResult.sunrise.monthNumber)
+        assertEquals(6, knownResult.sunrise.dayOfMonth)
+        assertEquals(TimeZone.UTC, knownResult.sunrise.zone)
     }
 }

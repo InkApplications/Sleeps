@@ -1,6 +1,7 @@
 package com.inkapplications.sleeps.state.sun
 
 import com.inkapplications.datetime.ZonedDate
+import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator
 import com.luckycatlabs.sunrisesunset.dto.Location
@@ -11,7 +12,8 @@ import java.util.TimeZone as JavaTimeZone
 
 internal class JvmSunScheduleProvider : SunScheduleProvider {
     private val calendar = Calendar.getInstance()
-    override fun getScheduleForLocation(coordinates: GeoCoordinates, date: ZonedDate): SunSchedule {
+
+    override fun getSunriseForLocation(coordinates: GeoCoordinates, date: ZonedDate): ZonedDateTime {
         val calculator = SunriseSunsetCalculator(
             Location(
                 coordinates.latitude.asDecimal,
@@ -25,13 +27,10 @@ internal class JvmSunScheduleProvider : SunScheduleProvider {
         calendar.timeZone = JavaTimeZone.getTimeZone(date.zone.id)
 
         val sunrise = calculator.getOfficialSunriseCalendarForDate(calendar)
-        val sunset = calculator.getOfficialSunsetCalendarForDate(calendar)
 
-        return SunSchedule(
-            sunrise = sunrise.timeInMillis
-                .let { Instant.fromEpochMilliseconds(it) }
-                .toLocalDateTime(date.zone)
-                .atZone(date.zone),
-        )
+        return sunrise.timeInMillis
+            .let { Instant.fromEpochMilliseconds(it) }
+            .toLocalDateTime(date.zone)
+            .atZone(date.zone)
     }
 }

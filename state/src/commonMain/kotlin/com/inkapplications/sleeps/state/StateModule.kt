@@ -9,7 +9,7 @@ import com.inkapplications.sleeps.state.location.LocationProvider
 import com.inkapplications.sleeps.state.notifications.NotificationStateAccess
 import com.inkapplications.sleeps.state.settings.Settings
 import com.inkapplications.sleeps.state.sun.SunScheduleProvider
-import com.inkapplications.sleeps.state.sun.SunStateProvider
+import com.inkapplications.sleeps.state.sun.LocationSunState
 import kimchi.Kimchi
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.*
@@ -35,7 +35,7 @@ class StateModule(
 ) {
     private val kimchi = Kimchi.apply { addLog(logWriter) }
     private val kimchiRegolithAdapter = KimchiRegolithAdapter(kimchi)
-    private val sunStateProvider = SunStateProvider(
+    private val sunStateProvider = LocationSunState(
         sunScheduleProvider = sunScheduleProvider,
         clock = clock,
         stateScope = stateScope,
@@ -69,7 +69,7 @@ class StateModule(
 
     private val alarmScheduler = AlarmScheduler(
         alarmAccess = alarmAccess,
-        sunStateProvider = sunStateProvider,
+        sunScheduleAccess = sunStateProvider,
         logger = kimchi,
     )
 

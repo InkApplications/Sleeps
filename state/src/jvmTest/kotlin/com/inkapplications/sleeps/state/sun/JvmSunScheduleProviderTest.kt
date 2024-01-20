@@ -14,13 +14,13 @@ class JvmSunScheduleProviderTest {
 
     @Test
     fun sunriseCalculation() {
-        val schedule = provider.getScheduleForLocation(
+        val schedule = provider.getSunriseForLocation(
             coordinates = GeoCoordinates(40.730610.latitude, (-73.935242).longitude),
             date = LocalDate(2024, 1, 6).atZone(TimeZone.of("America/New_York")),
         )
 
-        assertEquals(7, schedule.sunrise.hour)
-        assertEquals(1, schedule.sunrise.minute)
-        assertEquals(0, schedule.sunrise.second)
+        assertEquals(7, schedule.hour)
+        assertEquals(1, schedule.minute)
+        assertEquals(0, schedule.second)
     }
 }

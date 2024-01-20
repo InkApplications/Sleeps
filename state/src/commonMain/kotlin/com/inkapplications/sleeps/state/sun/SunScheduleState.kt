@@ -1,5 +1,7 @@
 package com.inkapplications.sleeps.state.sun
 
+import com.inkapplications.datetime.ZonedDateTime
+
 /**
  * Data state of the current sunrise/sunset schedule.
  */
@@ -15,13 +17,19 @@ sealed interface SunScheduleState {
      * This is likely due to unavailable location.
      */
     data class Unknown(
-        val centralUs: SunSchedule
+        /**
+         * The time of sunrise in central US timezone.
+         */
+        val centralUsSunrise: ZonedDateTime
     ): SunScheduleState
 
     /**
      * Sunrise/Sunset schedule for the current day.
      */
     data class Known(
-        val schedule: SunSchedule,
+        /**
+         * Local sunrise time in the current timezone.
+         */
+        val sunrise: ZonedDateTime,
     ): SunScheduleState
 }

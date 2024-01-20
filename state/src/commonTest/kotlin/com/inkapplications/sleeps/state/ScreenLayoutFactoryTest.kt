@@ -3,7 +3,6 @@ package com.inkapplications.sleeps.state
 import com.inkapplications.datetime.atZone
 import com.inkapplications.sleeps.state.notifications.NotificationControllerStub
 import com.inkapplications.sleeps.state.notifications.NotificationsState
-import com.inkapplications.sleeps.state.sun.SunSchedule
 import com.inkapplications.sleeps.state.sun.SunScheduleState
 import ink.ui.structures.elements.*
 import ink.ui.structures.layouts.CenteredElementLayout
@@ -38,9 +37,7 @@ class ScreenLayoutFactoryTest {
     fun initial() {
         val layout = factory.create(
             sunScheduleState = SunScheduleState.Unknown(
-                centralUs = SunSchedule(
-                    sunrise = testDateTime.atZone(TimeZone.UTC),
-                ),
+                centralUsSunrise = testDateTime.atZone(TimeZone.UTC),
             ),
             notificationsState = NotificationsState.Initial,
             notificationController = NotificationControllerStub,
@@ -55,9 +52,7 @@ class ScreenLayoutFactoryTest {
     fun loaded() {
         val layout = factory.create(
             sunScheduleState = SunScheduleState.Known(
-                schedule = SunSchedule(
-                    sunrise = testDateTime.atZone(TimeZone.UTC),
-                )
+                sunrise = testDateTime.atZone(TimeZone.UTC),
             ),
             notificationsState = NotificationsState.Configured(
                 sleepNotifications = true,

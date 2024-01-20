@@ -43,7 +43,7 @@ internal class ScreenLayoutFactory {
             is SunScheduleState.Known -> ScrollingListLayout(
                 items = listOf(
                     TextElement("Schedule", style = TextStyle.H1),
-                    TextElement("Sunrise: ${sunScheduleState.schedule.sunrise.localTime}"),
+                    TextElement("Sunrise: ${sunScheduleState.sunrise.localTime}"),
                     ElementList(
                         items = listOf(
                             TextElement(
