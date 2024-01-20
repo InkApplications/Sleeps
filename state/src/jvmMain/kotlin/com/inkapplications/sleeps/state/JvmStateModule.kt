@@ -1,5 +1,6 @@
 package com.inkapplications.sleeps.state
 
+import app.cash.sqldelight.db.SqlDriver
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.alarms.AlarmAccess
 import com.inkapplications.sleeps.state.alarms.AlarmBeeper
@@ -17,6 +18,7 @@ fun createJvmStateModule(
     logWriter: LogWriter,
     beeper: AlarmBeeper,
     alarmAccess: AlarmAccess,
+    settingsDriver: SqlDriver,
     initializers: List<Initializer> = emptyList(),
     stateScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     clock: ZonedClock = ZonedClock.System,
@@ -28,5 +30,6 @@ fun createJvmStateModule(
     alarmAccess = alarmAccess,
     logWriter = logWriter,
     beeper = beeper,
+    settingsDriver = settingsDriver,
     initializers = initializers,
 )

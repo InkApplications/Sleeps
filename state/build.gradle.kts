@@ -1,5 +1,14 @@
 plugins {
     id("library")
+    id("app.cash.sqldelight")
+}
+
+sqldelight {
+    databases {
+        create("Settings") {
+            packageName.set("com.inkapplications.sleeps.state.settings")
+        }
+    }
 }
 
 kotlin {
@@ -8,6 +17,7 @@ kotlin {
             dependencies {
                 implementation(kotlinLibraries.coroutines.core)
                 implementation(inkLibraries.regolith.processes)
+                implementation(thirdParty.sqldelight.coroutines)
                 api(inkLibraries.regolith.init)
                 api(inkLibraries.ui.structures)
                 api(inkLibraries.spondee.units)

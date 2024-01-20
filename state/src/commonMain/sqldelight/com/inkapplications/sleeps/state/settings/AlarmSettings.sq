@@ -1,0 +1,26 @@
+import kotlin.Boolean;
+
+CREATE TABLE AlarmSettings (
+    sleep_alarm INTEGER AS Boolean NOT NULL DEFAULT 0,
+    wake_alarm INTEGER AS Boolean NOT NULL DEFAULT 0
+);
+
+INSERT INTO AlarmSettings (sleep_alarm, wake_alarm)
+VALUES (0, 0);
+
+currentState:
+SELECT * FROM AlarmSettings LIMIT 1;
+
+toggleSleepAlarmStatus:
+UPDATE AlarmSettings
+SET sleep_alarm = CASE
+    WHEN sleep_alarm = 0 THEN 1
+    ELSE 0
+END;
+
+toggleWakeAlarmStatus:
+UPDATE AlarmSettings
+SET wake_alarm = CASE
+    WHEN wake_alarm = 0 THEN 1
+    ELSE 0
+END;

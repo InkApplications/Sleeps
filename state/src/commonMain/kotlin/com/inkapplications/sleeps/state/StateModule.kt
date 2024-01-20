@@ -1,11 +1,13 @@
 package com.inkapplications.sleeps.state
 
+import app.cash.sqldelight.db.SqlDriver
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.alarms.*
 import com.inkapplications.sleeps.state.alarms.AlarmScheduler
 import com.inkapplications.sleeps.state.alarms.BeepingAlarmController
 import com.inkapplications.sleeps.state.location.LocationProvider
 import com.inkapplications.sleeps.state.notifications.NotificationStateAccess
+import com.inkapplications.sleeps.state.settings.Settings
 import com.inkapplications.sleeps.state.sun.SunScheduleProvider
 import com.inkapplications.sleeps.state.sun.SunStateProvider
 import kimchi.Kimchi
@@ -26,6 +28,7 @@ class StateModule(
     beeper: AlarmBeeper,
     logWriter: LogWriter,
     initializers: List<Initializer>,
+    settingsDriver: SqlDriver,
     stateScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     clock: ZonedClock = ZonedClock.System,
 ) {
@@ -38,7 +41,11 @@ class StateModule(
         locationProvider = locationProvider,
     )
 
-    private val notificationStateAccess = NotificationStateAccess()
+    private val settingsDatabase = Settings(settingsDriver)
+
+    private val notificationStateAccess = NotificationStateAccess(
+        alarmSettings = settingsDatabase.alarmSettingsQueries,
+    )
 
     private val waiter = flow {
         delay(400.milliseconds)

@@ -4,10 +4,12 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.app.Application
 import android.location.LocationManager
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.inkapplications.sleeps.android.alarms.AlarmBeeper
 import com.inkapplications.sleeps.android.alarms.AndroidAlarmAccess
 import com.inkapplications.sleeps.android.alarms.AlarmNotifications
 import com.inkapplications.sleeps.state.createJvmStateModule
+import com.inkapplications.sleeps.state.settings.Settings
 import kimchi.logger.defaultWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +36,7 @@ class ApplicationModule(
         context = application,
         notificationManager = application.getSystemService(Activity.NOTIFICATION_SERVICE) as android.app.NotificationManager,
     )
+    private val settingsDriver = AndroidSqliteDriver(Settings.Schema, application, "settings.db")
 
     private val stateModule = createJvmStateModule(
         locationProvider = locationProvider,
@@ -42,6 +45,7 @@ class ApplicationModule(
         initializers = listOf(
             notifications,
         ),
+        settingsDriver = settingsDriver,
         stateScope = backgroundScope,
         logWriter = defaultWriter,
     )
