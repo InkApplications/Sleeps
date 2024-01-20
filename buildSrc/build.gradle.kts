@@ -8,6 +8,6 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.android.gradle)
-    implementation(libs.kotlin.gradle)
+    implementation(androidLibraries.android.gradle)
+    implementation(kotlinLibraries.kotlin.gradle)
 }

@@ -69,11 +69,11 @@ android {
 }
 
 dependencies {
-    implementation(libs.bundles.androidx)
-    implementation(platform(libs.compose.bom))
-    implementation(libs.bundles.compose)
-    implementation(libs.ink.ui.compose)
-    implementation(libs.ink.watermelon.android)
-    implementation(libs.kimchi.core)
+    implementation(androidLibraries.bundles.androidx)
+    implementation(platform(androidLibraries.compose.bom))
+    implementation(androidLibraries.bundles.compose)
+    implementation(inkLibraries.ui.compose)
+    implementation(inkLibraries.watermelon.android)
+    implementation(inkLibraries.kimchi.core)
     implementation(projects.state)
 }
