@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import regolith.init.Initializer
 import regolith.init.RegolithInitRunner
+import regolith.processes.daemon.DaemonInitializer
 import kotlin.time.Duration.Companion.milliseconds
 
 class StateModule(
@@ -68,13 +69,19 @@ class StateModule(
 
     private val alarmScheduler = AlarmScheduler(
         alarmAccess = alarmAccess,
-        sunScheduleProvider = sunScheduleProvider,
-        clock = clock,
+        sunStateProvider = sunStateProvider,
         logger = kimchi,
     )
 
+    private val daemonInitializer = DaemonInitializer(
+        daemons = listOf(alarmScheduler),
+        callbacks = kimchiRegolithAdapter,
+        daemonScope = stateScope,
+        clock = clock,
+    )
+
     private val internalInitializers: List<Initializer> = listOf(
-        alarmScheduler,
+        daemonInitializer,
     )
 
     val alarmController: AlarmController = BeepingAlarmController(
@@ -84,6 +91,7 @@ class StateModule(
     val init = RegolithInitRunner(
         initializers = initializers + internalInitializers,
         callbacks = kimchiRegolithAdapter,
+        initializerScope = stateScope,
     )
 }
 

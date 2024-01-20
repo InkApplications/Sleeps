@@ -37,7 +37,7 @@ internal class ScreenLayoutFactory {
     ): UiLayout {
         return when (sunScheduleState) {
             SunScheduleState.Initial -> loadingScreen
-            SunScheduleState.Unknown -> CenteredElementLayout(
+            is SunScheduleState.Unknown -> CenteredElementLayout(
                 body = TextElement("Unknown"),
             )
             is SunScheduleState.Known -> ScrollingListLayout(

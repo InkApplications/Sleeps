@@ -16,12 +16,19 @@ class AndroidAlarmAccess(
     private val alarmManager: AlarmManager,
 ): AlarmAccess {
     override fun addAlarm(id: AlarmId, time: Instant) {
-        Kimchi.info("Adding Alarm for $time")
+        Kimchi.info("Adding Alarm $id at $time")
         alarmManager.setAlarmClock(
             AlarmManager.AlarmClockInfo(
                 time.toEpochMilliseconds(),
                 context.createEditAlarmPendingIntent(),
             ),
+            context.createAlarmBroadcastPendingIntent(id),
+        )
+    }
+
+    override fun removeAlarm(id: AlarmId) {
+        Kimchi.info("Removing Alarm $id")
+        alarmManager.cancel(
             context.createAlarmBroadcastPendingIntent(id),
         )
     }

@@ -10,12 +10,14 @@ import ink.ui.structures.layouts.CenteredElementLayout
 import ink.ui.structures.layouts.ScrollingListLayout
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ScreenLayoutFactoryTest {
+    private val testDateTime = LocalTime(1, 2).atDate(2004, 5, 6)
     private val factory = ScreenLayoutFactory()
 
     @Test
@@ -35,7 +37,11 @@ class ScreenLayoutFactoryTest {
     @Test
     fun initial() {
         val layout = factory.create(
-            sunScheduleState = SunScheduleState.Unknown,
+            sunScheduleState = SunScheduleState.Unknown(
+                centralUs = SunSchedule(
+                    sunrise = testDateTime.atZone(TimeZone.UTC),
+                ),
+            ),
             notificationsState = NotificationsState.Initial,
             notificationController = NotificationControllerStub,
         )
@@ -50,7 +56,7 @@ class ScreenLayoutFactoryTest {
         val layout = factory.create(
             sunScheduleState = SunScheduleState.Known(
                 schedule = SunSchedule(
-                    sunrise = LocalTime(7, 1, 0).atZone(TimeZone.UTC),
+                    sunrise = testDateTime.atZone(TimeZone.UTC),
                 )
             ),
             notificationsState = NotificationsState.Configured(
@@ -63,7 +69,7 @@ class ScreenLayoutFactoryTest {
         assertTrue(layout is ScrollingListLayout, "Screen is a scrolling list")
         val sunDescriptionBody = layout.items[1]
         assertTrue(sunDescriptionBody is TextElement, "2nd item in list is the sun's description")
-        assertEquals("Sunrise: 07:01", sunDescriptionBody.text)
+        assertEquals("Sunrise: 01:02", sunDescriptionBody.text)
 
         val menu = layout.items[2]
         assertTrue(menu is ElementList, "3rd item in list the settings menu")

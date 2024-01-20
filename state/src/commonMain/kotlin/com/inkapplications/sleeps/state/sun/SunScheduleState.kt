@@ -14,7 +14,9 @@ sealed interface SunScheduleState {
      *
      * This is likely due to unavailable location.
      */
-    object Unknown: SunScheduleState
+    data class Unknown(
+        val centralUs: SunSchedule
+    ): SunScheduleState
 
     /**
      * Sunrise/Sunset schedule for the current day.

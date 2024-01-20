@@ -31,7 +31,6 @@ internal class JvmSunScheduleProvider : SunScheduleProvider {
             sunrise = sunrise.timeInMillis
                 .let { Instant.fromEpochMilliseconds(it) }
                 .toLocalDateTime(date.zone)
-                .time
                 .atZone(date.zone),
         )
     }
