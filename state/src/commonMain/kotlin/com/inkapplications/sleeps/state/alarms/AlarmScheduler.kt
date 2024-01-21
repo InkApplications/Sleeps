@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import regolith.processes.daemon.Daemon
 import regolith.processes.daemon.DaemonRunAttempt
 import regolith.processes.daemon.FailureSignal
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 
 /**
  * Schedules alarms to be invoked at the appropriate times.
@@ -26,8 +24,6 @@ internal class AlarmScheduler(
 ): Daemon {
     private val wakeAlarm = AlarmId("wake")
     private val sleepAlarm = AlarmId("sleep")
-    private val wakeLeadTime = 45.minutes
-    private val sleepLeadTime = 9.hours + wakeLeadTime
 
     override suspend fun startDaemon(): Nothing {
         combine(
@@ -35,13 +31,13 @@ internal class AlarmScheduler(
             notificationSettings.notificationsState.filterIsInstance<NotificationsState.Configured>(),
         ) { sunSchedule, settings ->
             val wakeTime = when (sunSchedule) {
-                is SunScheduleState.Known -> sunSchedule.sunrise.minus(wakeLeadTime)
-                is SunScheduleState.Unknown -> sunSchedule.centralUsSunrise.minus(wakeLeadTime)
+                is SunScheduleState.Known -> sunSchedule.sunrise.minus(settings.alarmMargin)
+                is SunScheduleState.Unknown -> sunSchedule.centralUsSunrise.minus(settings.alarmMargin)
                 SunScheduleState.Initial -> throw IllegalStateException("Cannot determine time for initial schedule state")
             }
             val sleepTime = when (sunSchedule) {
-                is SunScheduleState.Known -> sunSchedule.sunrise.minus(sleepLeadTime)
-                is SunScheduleState.Unknown -> sunSchedule.centralUsSunrise.minus(sleepLeadTime)
+                is SunScheduleState.Known -> sunSchedule.sunrise.minus(settings.alarmMargin + settings.sleepTarget + settings.sleepMargin)
+                is SunScheduleState.Unknown -> sunSchedule.centralUsSunrise.minus(settings.alarmMargin + settings.sleepTarget + settings.sleepMargin)
                 SunScheduleState.Initial -> throw IllegalStateException("Cannot determine time for initial schedule state")
             }
 
