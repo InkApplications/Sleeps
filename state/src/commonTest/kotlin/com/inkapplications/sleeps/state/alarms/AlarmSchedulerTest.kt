@@ -54,17 +54,17 @@ class AlarmSchedulerTest {
         val wakeAlarm = alarmAccess.addCalls.find { it.first.value == "wake" }?.second
         assertNotNull(wakeAlarm, "Wake alarm should be scheduled")
         assertEquals(
-            LocalDateTime(2021, 1, 1, 11, 15).atZone(TimeZone.UTC).instant,
+            LocalDateTime(2021, 1, 1, 11, 50).atZone(TimeZone.UTC).instant,
             wakeAlarm,
-            "Alarm is scheduled 45 mins before sunrise"
+            "Alarm is scheduled 10 mins before sunrise"
         )
 
         val sleepAlarm = alarmAccess.addCalls.find { it.first.value == "sleep" }?.second
         assertNotNull(sleepAlarm, "Sleep alarm should be scheduled")
         assertEquals(
-            LocalDateTime(2021, 1, 1, 2, 15).atZone(TimeZone.UTC).instant,
+            LocalDateTime(2021, 1, 1, 11, 0).atZone(TimeZone.UTC).instant,
             sleepAlarm,
-            "Alarm is scheduled 9 hours and 45 mins before sunrise"
+            "Sleep Notification is scheduled 1hr before sunrise"
         )
 
         job.cancel()
@@ -98,17 +98,17 @@ class AlarmSchedulerTest {
         val wakeAlarm = alarmAccess.addCalls.find { it.first.value == "wake" }?.second
         assertNotNull(wakeAlarm, "Wake alarm should be scheduled")
         assertEquals(
-            LocalDateTime(2021, 1, 1, 11, 15).atZone(TimeZone.UTC).instant,
+            LocalDateTime(2021, 1, 1, 11, 50).atZone(TimeZone.UTC).instant,
             wakeAlarm,
-            "Alarm is scheduled 45 mins before sunrise"
+            "Alarm is scheduled 10 mins before sunrise"
         )
 
         val sleepAlarm = alarmAccess.addCalls.find { it.first.value == "sleep" }?.second
         assertNotNull(sleepAlarm, "Sleep alarm should be scheduled")
         assertEquals(
-            LocalDateTime(2021, 1, 1, 2, 15).atZone(TimeZone.UTC).instant,
+            LocalDateTime(2021, 1, 1, 11, 0).atZone(TimeZone.UTC).instant,
             sleepAlarm,
-            "Alarm is scheduled 9 hours and 45 mins before sunrise"
+            "Sleep Notification is scheduled 1hr before sunrise"
         )
 
         job.cancel()
