@@ -1,5 +1,6 @@
 package com.inkapplications.sleeps.state.sun
 
+import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.datetime.ZonedDate
 import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
@@ -10,10 +11,13 @@ import kotlinx.datetime.*
 import java.util.Calendar
 import java.util.TimeZone as JavaTimeZone
 
-internal class JvmSunScheduleProvider : SunScheduleProvider {
+internal class JvmSunScheduleProvider(
+    private val clock: ZonedClock,
+) : SunScheduleProvider {
     private val calendar = Calendar.getInstance()
 
-    override fun getSunriseForLocation(coordinates: GeoCoordinates, date: ZonedDate): ZonedDateTime {
+    override fun getNextSunriseForLocation(coordinates: GeoCoordinates): ZonedDateTime {
+        val date = clock.zonedDateTime()
         val calculator = SunriseSunsetCalculator(
             Location(
                 coordinates.latitude.asDecimal,
@@ -26,7 +30,12 @@ internal class JvmSunScheduleProvider : SunScheduleProvider {
         calendar.set(Calendar.DAY_OF_MONTH, date.dayOfMonth)
         calendar.timeZone = JavaTimeZone.getTimeZone(date.zone.id)
 
-        val sunrise = calculator.getOfficialSunriseCalendarForDate(calendar)
+        val todaySunrise = calculator.getOfficialSunriseCalendarForDate(calendar)
+
+        val sunrise = if (todaySunrise.timeInMillis > clock.now().toEpochMilliseconds()) {
+            calendar.add(Calendar.DATE, 1)
+            calculator.getOfficialSunriseCalendarForDate(calendar)
+        } else todaySunrise
 
         return sunrise.timeInMillis
             .let { Instant.fromEpochMilliseconds(it) }

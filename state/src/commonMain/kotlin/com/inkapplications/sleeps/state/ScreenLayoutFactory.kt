@@ -10,6 +10,8 @@ import ink.ui.structures.elements.*
 import ink.ui.structures.layouts.CenteredElementLayout
 import ink.ui.structures.layouts.ScrollingListLayout
 import ink.ui.structures.layouts.UiLayout
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.time.Duration
 
 /**
  * Creates the application screen layout schema based on current application state.
@@ -22,6 +24,7 @@ internal class ScreenLayoutFactory {
         )
     )
 
+    val value = MutableStateFlow(0)
     /**
      * Default state to use when the application first starts.
      */
@@ -44,43 +47,120 @@ internal class ScreenLayoutFactory {
                 items = listOf(
                     TextElement("Schedule", style = TextStyle.H1),
                     TextElement("Sunrise: ${sunScheduleState.sunrise.localTime}"),
-                    ElementList(
-                        items = listOf(
-                            TextElement(
-                                text = "Settings",
-                                style = TextStyle.H2,
-                            ),
-                            *createSettings(notificationsState, notificationController)
-                        ),
-                        groupingStyle = GroupingStyle.Unified,
-                    )
+                    TextElement(
+                        text = "Settings",
+                        style = TextStyle.H2,
+                    ),
+                    *createNotificationSettings(notificationsState, notificationController)
                 )
             )
         }
     }
 
-    private fun createSettings(
+    private fun createNotificationSettings(
         state: NotificationsState,
         notificationController: NotificationController,
-    ): Array<MenuRowElement> {
-        val sleepNotifications = MenuRowElement(
-            text = "Sleep Notifications",
-            onClick = notificationController::onSleepNotificationClick,
-            rightElement = CheckBoxElement(
-                checked = state is NotificationsState.Configured && state.sleepNotifications,
-                onClick = notificationController::onSleepNotificationClick,
+    ): Array<UiElement> {
+        return when (state) {
+            is NotificationsState.Configured -> arrayOf(
+                ElementList(
+                    items = createWakeAlarmSettings(state, notificationController),
+                    groupingStyle = GroupingStyle.Unified,
+                ),
+                ElementList(
+                    items = createSleepAlarmSettings(state, notificationController),
+                    groupingStyle = GroupingStyle.Unified,
+                ),
             )
-        )
+            NotificationsState.Initial -> emptyArray()
+        }
+    }
 
-        val alarm = MenuRowElement(
-            text = "Wake Alarm",
+    private fun createWakeAlarmSettings(
+        state: NotificationsState.Configured,
+        notificationController: NotificationController,
+    ): List<UiElement> {
+        val alarmHeading = TextElement(
+            text = "Sunrise Alarm",
+            style = TextStyle.H3,
+        )
+        val alarm = createToggleRow(
+            text = "Enable",
+            checked = state.wakeAlarm,
             onClick = notificationController::onWakeAlarmClick,
-            rightElement = CheckBoxElement(
-                checked = state is NotificationsState.Configured && state.wakeAlarm,
-                onClick = notificationController::onWakeAlarmClick,
+        )
+        val wakeMargin = MenuRowElement(
+            text = "Margin (hours)",
+            rightElement = SpinnerElement(
+                value = state.alarmMargin.format(),
+                hasPreviousValue = state.alarmMargin.isPositive(),
+                onNextValue = notificationController::onIncreaseWakeAlarmMargin,
+                onPreviousValue = notificationController::onDecreaseWakeAlarmMargin.takeIf { state.alarmMargin.isPositive() } ?: {},
             )
         )
 
-        return arrayOf(sleepNotifications, alarm)
+        return listOf(
+            alarmHeading,
+            alarm,
+            wakeMargin,
+        )
+    }
+
+    private fun Duration.format() = (inWholeMinutes / 60f).toFloat().toString()
+
+    private fun createSleepAlarmSettings(
+        state: NotificationsState.Configured,
+        notificationController: NotificationController,
+    ): List<UiElement> {
+
+        val sleepHeading = TextElement(
+            text = "Sleep Alarm",
+            style = TextStyle.H3,
+        )
+        val sleepNotifications = createToggleRow(
+            text = "Enable",
+            checked = state.sleepNotifications,
+            onClick = notificationController::onSleepNotificationClick,
+        )
+        val sleepTarget = MenuRowElement(
+            text = "Sleep Target (hours)",
+            rightElement = SpinnerElement(
+                value = state.sleepTarget.format(),
+                hasPreviousValue = state.sleepTarget.isPositive(),
+                onNextValue = notificationController::onIncreaseSleepTarget,
+                onPreviousValue = notificationController::onDecreaseSleepTarget.takeIf { state.sleepTarget.isPositive() } ?: {},
+            )
+        )
+        val sleepMargin = MenuRowElement(
+            text = "Margin (hours)",
+            rightElement = SpinnerElement(
+                value = state.sleepMargin.format(),
+                hasPreviousValue = state.sleepMargin.isPositive(),
+                onNextValue = notificationController::onIncreaseSleepAlarmMargin,
+                onPreviousValue = notificationController::onDecreaseSleepAlarmMargin.takeIf { state.sleepMargin.isPositive() } ?: {},
+            )
+        )
+
+        return listOf(
+            sleepHeading,
+            sleepNotifications,
+            sleepTarget,
+            sleepMargin,
+        )
+    }
+
+    private fun createToggleRow(
+        text: String,
+        checked: Boolean,
+        onClick: () -> Unit,
+    ): MenuRowElement {
+        return MenuRowElement(
+            text = text,
+            onClick = onClick,
+            rightElement = CheckBoxElement(
+                checked = checked,
+                onClick = onClick,
+            )
+        )
     }
 }

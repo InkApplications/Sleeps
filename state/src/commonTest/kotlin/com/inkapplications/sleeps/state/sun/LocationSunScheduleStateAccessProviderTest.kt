@@ -18,18 +18,17 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.hours
 
 class LocationSunScheduleStateAccessProviderTest {
-    private val testDateTime = LocalTime(1, 2, 3).atDate(2004, 5, 6)
+    private val testDateTime = LocalTime(1, 2, 3).atDate(2004, 5, 6).atZone(TimeZone.UTC)
     private val testClock = object: Clock {
-        override fun now(): Instant = testDateTime.atZone(TimeZone.UTC).minus(1.hours).instant
-    }.atZone(TimeZone.UTC)
+        override fun now(): Instant = testDateTime.minus(1.hours).instant
+    }.atZone(testDateTime.zone)
 
     @Test
     fun initial() = runTest {
         val provider = LocationSunState(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getSunriseForLocation(coordinates: GeoCoordinates, date: ZonedDate): ZonedDateTime { TODO() }
+                override fun getNextSunriseForLocation(coordinates: GeoCoordinates): ZonedDateTime { TODO() }
             },
-            clock = testClock,
             stateScope = backgroundScope,
             locationProvider = DummyLocationProvider,
         )
@@ -41,11 +40,10 @@ class LocationSunScheduleStateAccessProviderTest {
     fun nullLocation() = runTest {
         val provider = LocationSunState(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getSunriseForLocation(coordinates: GeoCoordinates, date: ZonedDate): ZonedDateTime {
-                    return testDateTime.atZone(date.zone)
+                override fun getNextSunriseForLocation(coordinates: GeoCoordinates): ZonedDateTime {
+                    return testDateTime
                 }
             },
-            clock = testClock,
             stateScope = backgroundScope,
             locationProvider = FakeLocationProvider(null),
         )
@@ -66,11 +64,10 @@ class LocationSunScheduleStateAccessProviderTest {
     fun knownLocation() = runTest {
         val provider = LocationSunState(
             sunScheduleProvider = object: SunScheduleProvider {
-                override fun getSunriseForLocation(coordinates: GeoCoordinates, date: ZonedDate): ZonedDateTime {
-                    return testDateTime.atZone(date.zone)
+                override fun getNextSunriseForLocation(coordinates: GeoCoordinates): ZonedDateTime {
+                    return testDateTime
                 }
             },
-            clock = testClock,
             stateScope = backgroundScope,
             locationProvider = FakeLocationProvider(GeoCoordinates(123.latitude, (456).longitude)),
         )

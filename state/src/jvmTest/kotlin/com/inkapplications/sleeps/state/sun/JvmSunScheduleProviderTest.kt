@@ -4,23 +4,24 @@ import com.inkapplications.datetime.atZone
 import inkapplications.spondee.spatial.GeoCoordinates
 import inkapplications.spondee.spatial.latitude
 import inkapplications.spondee.spatial.longitude
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
+import kotlinx.datetime.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class JvmSunScheduleProviderTest {
-    private val provider = JvmSunScheduleProvider()
+    val now = LocalDate(2024, 1, 6).atTime(LocalTime(1, 2, 3)).atZone(TimeZone.of("America/New_York"))
+    private val provider = JvmSunScheduleProvider(object: Clock {
+        override fun now(): Instant = now.instant
+    }.atZone(now.zone))
 
     @Test
     fun sunriseCalculation() {
-        val schedule = provider.getSunriseForLocation(
+        val schedule = provider.getNextSunriseForLocation(
             coordinates = GeoCoordinates(40.730610.latitude, (-73.935242).longitude),
-            date = LocalDate(2024, 1, 6).atZone(TimeZone.of("America/New_York")),
         )
 
         assertEquals(7, schedule.hour)
-        assertEquals(1, schedule.minute)
+        assertEquals(0, schedule.minute)
         assertEquals(0, schedule.second)
     }
 }

@@ -14,12 +14,17 @@ import kotlinx.datetime.TimeZone
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.time.Duration.Companion.minutes
 
 class AlarmSchedulerTest {
-    private val enabledNotificationStateFake = NotificationStateFake(NotificationsState.Configured(
+    private val fakeConfig = NotificationsState.Configured(
         sleepNotifications = true,
         wakeAlarm = true,
-    ))
+        alarmMargin = 10.minutes,
+        sleepMargin = 20.minutes,
+        sleepTarget = 30.minutes,
+    )
+    private val enabledNotificationStateFake = NotificationStateFake(fakeConfig)
 
     @Test
     fun alarmSchedule() = runTest {
@@ -163,7 +168,7 @@ class AlarmSchedulerTest {
 
     @Test
     fun alarmsDisabled() = runTest {
-        val notificationsFake = NotificationStateFake(NotificationsState.Configured(
+        val notificationsFake = NotificationStateFake(fakeConfig.copy(
             sleepNotifications = false,
             wakeAlarm = false,
         ))

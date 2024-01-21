@@ -7,6 +7,7 @@ sqldelight {
     databases {
         create("Settings") {
             packageName.set("com.inkapplications.sleeps.state.settings")
+            schemaOutputDirectory.set(file("src/commonMain/sqldelight/databases"))
         }
     }
 }

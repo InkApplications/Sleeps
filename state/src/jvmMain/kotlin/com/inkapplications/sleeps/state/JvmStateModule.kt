@@ -24,7 +24,7 @@ fun createJvmStateModule(
     clock: ZonedClock = ZonedClock.System,
 ) = StateModule(
     locationProvider = locationProvider,
-    sunScheduleProvider = JvmSunScheduleProvider(),
+    sunScheduleProvider = JvmSunScheduleProvider(clock),
     stateScope = stateScope,
     clock = clock,
     alarmAccess = alarmAccess,

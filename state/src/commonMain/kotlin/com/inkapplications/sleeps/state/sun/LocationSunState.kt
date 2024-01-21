@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 internal class LocationSunState(
     private val sunScheduleProvider: SunScheduleProvider,
     locationProvider: LocationProvider,
-    private val clock: ZonedClock,
     stateScope: CoroutineScope,
 ): SunScheduleStateAccess {
     private val usGeographicCenter = GeoCoordinates(
@@ -30,14 +29,12 @@ internal class LocationSunState(
 
     private fun createState(location: GeoCoordinates?): SunScheduleState {
         return if (location == null) {
-            sunScheduleProvider.getSunriseForLocation(
+            sunScheduleProvider.getNextSunriseForLocation(
                 coordinates = usGeographicCenter,
-                date = clock.zonedDate(),
             ).let(SunScheduleState::Unknown)
         } else {
-            sunScheduleProvider.getSunriseForLocation(
+            sunScheduleProvider.getNextSunriseForLocation(
                 coordinates = location,
-                date = clock.zonedDate(),
             ).let(SunScheduleState::Known)
         }
     }

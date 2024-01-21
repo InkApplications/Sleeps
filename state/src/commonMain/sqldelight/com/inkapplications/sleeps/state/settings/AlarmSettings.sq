@@ -1,12 +1,16 @@
 import kotlin.Boolean;
+import kotlin.time.Duration;
 
 CREATE TABLE AlarmSettings (
     sleep_alarm INTEGER AS Boolean NOT NULL DEFAULT 0,
-    wake_alarm INTEGER AS Boolean NOT NULL DEFAULT 0
+    wake_alarm INTEGER AS Boolean NOT NULL DEFAULT 0,
+    alarm_margin INTEGER AS Duration NOT NULL DEFAULT 30,
+    sleep_target INTEGER AS Duration NOT NULL DEFAULT 480,
+    sleep_margin INTEGER AS Duration NOT NULL DEFAULT 60
 );
 
-INSERT INTO AlarmSettings (sleep_alarm, wake_alarm)
-VALUES (0, 0);
+INSERT INTO AlarmSettings (sleep_alarm, wake_alarm, alarm_margin, sleep_target, sleep_margin)
+VALUES (0, 0, 30, 480, 60);
 
 currentState:
 SELECT * FROM AlarmSettings LIMIT 1;
@@ -24,3 +28,33 @@ SET wake_alarm = CASE
     WHEN wake_alarm = 0 THEN 1
     ELSE 0
 END;
+
+increaseAlarmMargin:
+UPDATE AlarmSettings
+SET alarm_margin = alarm_margin + ?
+WHERE 1;
+
+decreaseAlarmMargin:
+UPDATE AlarmSettings
+SET alarm_margin = alarm_margin - ?
+WHERE 1;
+
+increaseSleepTarget:
+UPDATE AlarmSettings
+SET sleep_target = sleep_target + ?
+WHERE 1;
+
+decreaseSleepTarget:
+UPDATE AlarmSettings
+SET sleep_target = sleep_target - ?
+WHERE 1;
+
+increaseSleepMargin:
+UPDATE AlarmSettings
+SET sleep_margin = sleep_margin + ?
+WHERE 1;
+
+decreaseSleepMargin:
+UPDATE AlarmSettings
+SET sleep_margin = sleep_margin - ?
+WHERE 1;
