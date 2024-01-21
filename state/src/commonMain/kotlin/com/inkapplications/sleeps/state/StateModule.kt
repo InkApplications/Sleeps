@@ -6,6 +6,7 @@ import com.inkapplications.sleeps.state.alarms.*
 import com.inkapplications.sleeps.state.alarms.AlarmScheduler
 import com.inkapplications.sleeps.state.alarms.BeepingAlarmController
 import com.inkapplications.sleeps.state.location.LocationProvider
+import com.inkapplications.sleeps.state.notifications.DatabaseNotificationStateAccess
 import com.inkapplications.sleeps.state.notifications.NotificationStateAccess
 import com.inkapplications.sleeps.state.settings.Settings
 import com.inkapplications.sleeps.state.sun.SunScheduleProvider
@@ -44,7 +45,7 @@ class StateModule(
 
     private val settingsDatabase = Settings(settingsDriver)
 
-    private val notificationStateAccess = NotificationStateAccess(
+    private val notificationStateAccess = DatabaseNotificationStateAccess(
         alarmSettings = settingsDatabase.alarmSettingsQueries,
     )
 
@@ -70,6 +71,7 @@ class StateModule(
     private val alarmScheduler = AlarmScheduler(
         alarmAccess = alarmAccess,
         sunScheduleAccess = sunStateProvider,
+        notificationSettings = notificationStateAccess,
         logger = kimchi,
     )
 

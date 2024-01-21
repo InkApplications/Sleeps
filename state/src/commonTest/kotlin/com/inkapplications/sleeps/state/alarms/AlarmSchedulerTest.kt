@@ -1,6 +1,8 @@
 package com.inkapplications.sleeps.state.alarms
 
 import com.inkapplications.datetime.atZone
+import com.inkapplications.sleeps.state.notifications.NotificationStateFake
+import com.inkapplications.sleeps.state.notifications.NotificationsState
 import com.inkapplications.sleeps.state.sun.SunScheduleAccessFake
 import com.inkapplications.sleeps.state.sun.SunScheduleState
 import kimchi.logger.EmptyLogger
@@ -13,6 +15,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class AlarmSchedulerTest {
+    private val enabledNotificationStateFake = NotificationStateFake(NotificationsState.Configured(
+        sleepNotifications = true,
+        wakeAlarm = true,
+    ))
+
     @Test
     fun alarmSchedule() = runTest {
         val sunriseTime = LocalDateTime(2021, 1, 1, 12, 0).atZone(TimeZone.UTC)
@@ -24,6 +31,7 @@ class AlarmSchedulerTest {
                     sunrise = sunriseTime,
                 ),
             ),
+            notificationSettings = enabledNotificationStateFake,
             logger = EmptyLogger
         )
 
@@ -57,7 +65,8 @@ class AlarmSchedulerTest {
                     centralUsSunrise = sunriseTime,
                 ),
             ),
-            logger = EmptyLogger
+            notificationSettings = enabledNotificationStateFake,
+            logger = EmptyLogger,
         )
 
         val job = launch {
@@ -80,13 +89,14 @@ class AlarmSchedulerTest {
     }
 
     @Test
-    fun initial() = runTest {
+    fun initializingSchedule() = runTest {
         val alarmAccess = AlarmAccessSpy()
         val alarmScheduler = AlarmScheduler(
             alarmAccess = alarmAccess,
             sunScheduleAccess = SunScheduleAccessFake(
                 SunScheduleState.Initial,
             ),
+            notificationSettings = enabledNotificationStateFake,
             logger = EmptyLogger
         )
 
@@ -97,6 +107,65 @@ class AlarmSchedulerTest {
         runCurrent()
 
         assertEquals(0, alarmAccess.clearCalls.size, "Should clear existing alarms")
+        assertEquals(0, alarmAccess.addCalls.size)
+
+        job.cancel()
+    }
+
+    @Test
+    fun initializingSettings() = runTest {
+        val notificationsFake = NotificationStateFake(NotificationsState.Initial)
+        val sunriseTime = LocalDateTime(2021, 1, 1, 12, 0).atZone(TimeZone.UTC)
+        val alarmAccess = AlarmAccessSpy()
+        val alarmScheduler = AlarmScheduler(
+            alarmAccess = alarmAccess,
+            sunScheduleAccess = SunScheduleAccessFake(
+                SunScheduleState.Unknown(
+                    centralUsSunrise = sunriseTime,
+                ),
+            ),
+            notificationSettings = notificationsFake,
+            logger = EmptyLogger,
+        )
+
+        val job = launch {
+            alarmScheduler.startDaemon()
+        }
+
+        runCurrent()
+
+        assertEquals(0, alarmAccess.clearCalls.size, "Should clear existing alarms")
+        assertEquals(0, alarmAccess.addCalls.size)
+
+        job.cancel()
+    }
+
+    @Test
+    fun alarmsDisabled() = runTest {
+        val notificationsFake = NotificationStateFake(NotificationsState.Configured(
+            sleepNotifications = false,
+            wakeAlarm = false,
+        ))
+        val sunriseTime = LocalDateTime(2021, 1, 1, 12, 0).atZone(TimeZone.UTC)
+        val alarmAccess = AlarmAccessSpy()
+        val alarmScheduler = AlarmScheduler(
+            alarmAccess = alarmAccess,
+            sunScheduleAccess = SunScheduleAccessFake(
+                SunScheduleState.Unknown(
+                    centralUsSunrise = sunriseTime,
+                ),
+            ),
+            notificationSettings = notificationsFake,
+            logger = EmptyLogger,
+        )
+
+        val job = launch {
+            alarmScheduler.startDaemon()
+        }
+
+        runCurrent()
+
+        assertEquals(1, alarmAccess.clearCalls.size, "Should clear existing alarms")
         assertEquals(0, alarmAccess.addCalls.size)
 
         job.cancel()
