@@ -10,7 +10,6 @@ import ink.ui.structures.elements.*
 import ink.ui.structures.layouts.CenteredElementLayout
 import ink.ui.structures.layouts.ScrollingListLayout
 import ink.ui.structures.layouts.UiLayout
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Duration
 
 /**
@@ -24,7 +23,6 @@ internal class ScreenLayoutFactory {
         )
     )
 
-    val value = MutableStateFlow(0)
     /**
      * Default state to use when the application first starts.
      */
@@ -106,7 +104,7 @@ internal class ScreenLayoutFactory {
         )
     }
 
-    private fun Duration.format() = (inWholeMinutes / 60f).toFloat().toString()
+    private fun Duration.format() = (inWholeMinutes / 60f).toString()
 
     private fun createSleepAlarmSettings(
         state: NotificationsState.Configured,
