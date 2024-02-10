@@ -4,17 +4,17 @@ import app.cash.sqldelight.db.SqlDriver
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.alarms.AlarmAccess
 import com.inkapplications.sleeps.state.alarms.AlarmBeeper
-import com.inkapplications.sleeps.state.location.LocationProvider
 import com.inkapplications.sleeps.state.sun.JvmSunScheduleProvider
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.*
 import regolith.init.Initializer
+import regolith.sensors.location.LocationAccess
 
 /**
  * Create the state module with defaults for the JVM.
  */
 fun createJvmStateModule(
-    locationProvider: LocationProvider,
+    locationAccess: LocationAccess,
     logWriter: LogWriter,
     beeper: AlarmBeeper,
     alarmAccess: AlarmAccess,
@@ -23,7 +23,7 @@ fun createJvmStateModule(
     stateScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     clock: ZonedClock = ZonedClock.System,
 ) = StateModule(
-    locationProvider = locationProvider,
+    locationAccess = locationAccess,
     sunScheduleProvider = JvmSunScheduleProvider(clock),
     stateScope = stateScope,
     clock = clock,

@@ -20,6 +20,7 @@ kotlin {
                 implementation(inkLibraries.regolith.processes)
                 implementation(thirdParty.sqldelight.coroutines)
                 api(inkLibraries.regolith.init)
+                api(inkLibraries.regolith.sensors)
                 api(inkLibraries.ui.structures)
                 api(inkLibraries.spondee.units)
                 api(inkLibraries.watermelon.datetime)

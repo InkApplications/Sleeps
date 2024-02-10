@@ -1,10 +1,10 @@
 package com.inkapplications.sleeps.state.sun
 
-import com.inkapplications.datetime.ZonedDate
 import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
-import com.inkapplications.sleeps.state.location.DummyLocationProvider
-import com.inkapplications.sleeps.state.location.FakeLocationProvider
+import com.inkapplications.sleeps.state.location.DummyLocationAccess
+import com.inkapplications.sleeps.state.location.FakeLocationAccess
+import inkapplications.spondee.measure.metric.meters
 import inkapplications.spondee.spatial.GeoCoordinates
 import inkapplications.spondee.spatial.latitude
 import inkapplications.spondee.spatial.longitude
@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.*
+import regolith.sensors.location.LocationError
+import regolith.sensors.location.LocationState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -30,7 +32,7 @@ class LocationSunScheduleStateAccessProviderTest {
                 override fun getNextSunriseForLocation(coordinates: GeoCoordinates): ZonedDateTime { TODO() }
             },
             stateScope = backgroundScope,
-            locationProvider = DummyLocationProvider,
+            locationAccess = DummyLocationAccess,
         )
 
         assertEquals(SunScheduleState.Initial, provider.sunState.value)
@@ -45,7 +47,7 @@ class LocationSunScheduleStateAccessProviderTest {
                 }
             },
             stateScope = backgroundScope,
-            locationProvider = FakeLocationProvider(null),
+            locationAccess = FakeLocationAccess(LocationState.Unknown(LocationError.Disabled)),
         )
 
         val results = provider.sunState.take(2).toList()
@@ -69,7 +71,12 @@ class LocationSunScheduleStateAccessProviderTest {
                 }
             },
             stateScope = backgroundScope,
-            locationProvider = FakeLocationProvider(GeoCoordinates(123.latitude, (456).longitude)),
+            locationAccess = FakeLocationAccess(
+                location = LocationState.Known(
+                    coordinates = GeoCoordinates(123.latitude, (456).longitude),
+                    accuracy = 0.meters,
+                )
+            ),
         )
 
         val results = provider.sunState.take(2).toList()

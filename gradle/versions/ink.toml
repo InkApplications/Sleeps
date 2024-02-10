@@ -1,5 +1,5 @@
 [versions]
-regolith = "1.1.0"
+regolith = "1.2.1"
 ink-ui = "0.3.1"
 watermelon = "1.4.0"
 
@@ -18,6 +18,10 @@ module = "com.inkapplications.regolith:processes"
 [libraries.regolith-resources]
 version.ref = "regolith"
 module = "com.inkapplications.regolith:resources"
+
+[libraries.regolith-sensors]
+version.ref = "regolith"
+module = "com.inkapplications.regolith:sensors"
 
 [libraries.ui-structures]
 version.ref = "ink-ui"
@@ -40,4 +44,4 @@ version.ref = "watermelon"
 module = "com.inkapplications.watermelon:android"
 
 [bundles]
-regolith = ["regolith-init", "regolith-processes", "regolith-resources"]
+regolith = ["regolith-init", "regolith-processes", "regolith-resources", "regolith-sensors"]

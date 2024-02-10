@@ -1,12 +1,10 @@
 package com.inkapplications.sleeps.state
 
-import app.cash.sqldelight.ColumnAdapter
 import app.cash.sqldelight.db.SqlDriver
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.alarms.*
 import com.inkapplications.sleeps.state.alarms.AlarmScheduler
 import com.inkapplications.sleeps.state.alarms.BeepingAlarmController
-import com.inkapplications.sleeps.state.location.LocationProvider
 import com.inkapplications.sleeps.state.notifications.DatabaseNotificationStateAccess
 import com.inkapplications.sleeps.state.settings.AlarmSettings
 import com.inkapplications.sleeps.state.settings.MinutesDurationAdapter
@@ -23,10 +21,11 @@ import kotlinx.coroutines.flow.stateIn
 import regolith.init.Initializer
 import regolith.init.RegolithInitRunner
 import regolith.processes.daemon.DaemonInitializer
+import regolith.sensors.location.LocationAccess
 import kotlin.time.Duration.Companion.milliseconds
 
 class StateModule(
-    locationProvider: LocationProvider,
+    locationAccess: LocationAccess,
     sunScheduleProvider: SunScheduleProvider,
     alarmAccess: AlarmAccess,
     beeper: AlarmBeeper,
@@ -41,7 +40,7 @@ class StateModule(
     private val sunStateProvider = LocationSunState(
         sunScheduleProvider = sunScheduleProvider,
         stateScope = stateScope,
-        locationProvider = locationProvider,
+        locationAccess = locationAccess,
     )
 
     private val settingsDatabase = Settings(

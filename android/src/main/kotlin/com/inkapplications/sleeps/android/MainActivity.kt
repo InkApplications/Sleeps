@@ -18,7 +18,7 @@ class MainActivity: ComponentActivity() {
         super.onCreate(savedInstanceState)
         with(SleepApplication.module) {
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { _ ->
-                locationProvider.onPermissionsChange()
+                locationAccess.onPermissionChange()
             }.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.POST_NOTIFICATIONS))
 
             setContent {

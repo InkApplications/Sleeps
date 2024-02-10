@@ -13,6 +13,8 @@ import com.inkapplications.sleeps.state.settings.Settings
 import kimchi.logger.defaultWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import regolith.sensors.location.AndroidLocationAccess
+import regolith.sensors.location.LocationUpdateConfig
 
 /**
  * Application-wide Dependency module.
@@ -24,9 +26,10 @@ class ApplicationModule(
 ) {
     val backgroundScope = CoroutineScope(Dispatchers.Default)
     val beeper = AlarmBeeper(application)
-    val locationProvider = AndroidLocationProvider(
+    val locationAccess = AndroidLocationAccess(
         locationManager = application.getSystemService(Activity.LOCATION_SERVICE) as LocationManager,
         context = application,
+        config = LocationUpdateConfig(),
     )
     val alarmAccess = AndroidAlarmAccess(
         context = application,
@@ -39,7 +42,7 @@ class ApplicationModule(
     private val settingsDriver = AndroidSqliteDriver(Settings.Schema, application, "settings.db")
 
     private val stateModule = createJvmStateModule(
-        locationProvider = locationProvider,
+        locationAccess = locationAccess,
         alarmAccess = alarmAccess,
         beeper = beeper,
         initializers = listOf(
