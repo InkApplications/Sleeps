@@ -63,4 +63,5 @@ class ApplicationModule(
     val screenState = stateModule.screenState
     val initRunner = stateModule.init
     val alarmExecutor = stateModule.alarmController
+    val bootController = stateModule.bootController
 }

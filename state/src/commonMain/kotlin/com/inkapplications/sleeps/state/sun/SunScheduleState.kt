@@ -12,6 +12,11 @@ sealed interface SunScheduleState {
     object Initial: SunScheduleState
 
     /**
+     * States used after some data has been loaded.
+     */
+    sealed interface Initialized: SunScheduleState
+
+    /**
      * Indicates that a sunrise/sunset schedule cannot be determined.
      *
      * This is likely due to unavailable location.
@@ -21,7 +26,7 @@ sealed interface SunScheduleState {
          * The time of sunrise in central US timezone.
          */
         val centralUsSunrise: ZonedDateTime
-    ): SunScheduleState
+    ): Initialized
 
     /**
      * Sunrise/Sunset schedule for the current day.
@@ -31,5 +36,5 @@ sealed interface SunScheduleState {
          * Local sunrise time in the current timezone.
          */
         val sunrise: ZonedDateTime,
-    ): SunScheduleState
+    ): Initialized
 }

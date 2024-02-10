@@ -97,6 +97,8 @@ class StateModule(
         beeper = beeper,
     )
 
+    val bootController: DeviceBootController = alarmScheduler
+
     val init = RegolithInitRunner(
         initializers = initializers + internalInitializers,
         callbacks = kimchiRegolithAdapter,
