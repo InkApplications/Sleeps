@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.app.Application
 import android.location.LocationManager
+import androidx.core.location.LocationRequestCompat
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.inkapplications.sleeps.android.alarms.AlarmBeeper
 import com.inkapplications.sleeps.android.alarms.AndroidAlarmAccess
@@ -15,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import regolith.sensors.location.AndroidLocationAccess
 import regolith.sensors.location.LocationUpdateConfig
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Application-wide Dependency module.
@@ -29,7 +31,12 @@ class ApplicationModule(
     val locationAccess = AndroidLocationAccess(
         locationManager = application.getSystemService(Activity.LOCATION_SERVICE) as LocationManager,
         context = application,
-        config = LocationUpdateConfig(),
+        config = LocationUpdateConfig(
+            request = LocationRequestCompat
+                .Builder(LocationRequestCompat.PASSIVE_INTERVAL)
+                .setMinUpdateIntervalMillis(1.minutes.inWholeMilliseconds)
+                .build(),
+        ),
     )
     val alarmAccess = AndroidAlarmAccess(
         context = application,

@@ -12,6 +12,11 @@ import androidx.compose.runtime.collectAsState
 import ink.ui.render.compose.ComposeRenderer
 
 private const val EditAlarmIntentId = 13987
+private val Permissions = arrayOf(
+    Manifest.permission.ACCESS_COARSE_LOCATION,
+    Manifest.permission.POST_NOTIFICATIONS,
+    Manifest.permission.SCHEDULE_EXACT_ALARM,
+)
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +24,7 @@ class MainActivity: ComponentActivity() {
         with(SleepApplication.module) {
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { _ ->
                 locationAccess.onPermissionChange()
-            }.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.POST_NOTIFICATIONS))
+            }.launch(Permissions)
 
             setContent {
                 ComposeRenderer(getRenderTheme()).render(screenState.collectAsState().value)

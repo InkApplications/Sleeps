@@ -17,6 +17,10 @@ class AndroidAlarmAccess(
 ): AlarmAccess {
     override fun addAlarm(id: AlarmId, time: Instant) {
         Kimchi.info("Adding Alarm $id at $time")
+        if (!alarmManager.canScheduleExactAlarms()) {
+            Kimchi.error("Unable to schedule Exact Alarms")
+            return
+        }
         alarmManager.setAlarmClock(
             AlarmManager.AlarmClockInfo(
                 time.toEpochMilliseconds(),
