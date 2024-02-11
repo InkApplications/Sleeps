@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(androidLibraries.android.gradle)
-    implementation(kotlinLibraries.kotlin.gradle)
-    implementation(thirdParty.sqldelight.gradle)
+    implementation(libs.android.gradle)
+    implementation(libs.kotlin.gradle)
+    implementation(libs.sqldelight.gradle)
 }

@@ -69,12 +69,12 @@ android {
 }
 
 dependencies {
-    implementation(androidLibraries.bundles.androidx)
-    implementation(platform(androidLibraries.compose.bom))
-    implementation(androidLibraries.bundles.compose)
-    implementation(thirdParty.sqldelight.android)
-    implementation(inkLibraries.ui.compose)
-    implementation(inkLibraries.watermelon.android)
-    implementation(inkLibraries.kimchi.core)
+    implementation(libs.bundles.androidx)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.compose)
+    implementation(libs.sqldelight.android)
+    implementation(libs.ui.compose)
+    implementation(libs.watermelon.android)
+    implementation(libs.kimchi.core)
     implementation(projects.state)
 }
