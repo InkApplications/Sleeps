@@ -10,6 +10,8 @@ import inkapplications.spondee.spatial.latitude
 import inkapplications.spondee.spatial.longitude
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.*
 import regolith.sensors.location.LocationError
@@ -17,13 +19,12 @@ import regolith.sensors.location.LocationState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
-class LocationSunScheduleStateAccessProviderTest {
+class LocationSunStateAccessTest {
     private val testDateTime = LocalTime(1, 2, 3).atDate(2004, 5, 6).atZone(TimeZone.UTC)
-    private val testClock = object: Clock {
-        override fun now(): Instant = testDateTime.minus(1.hours).instant
-    }.atZone(testDateTime.zone)
 
     @Test
     fun initial() = runTest {
@@ -90,5 +91,34 @@ class LocationSunScheduleStateAccessProviderTest {
         assertEquals(5, knownResult.sunrise.monthNumber)
         assertEquals(6, knownResult.sunrise.dayOfMonth)
         assertEquals(TimeZone.UTC, knownResult.sunrise.zone)
+    }
+
+    @Test
+    fun expiry() = runTest {
+        val clock = object: Clock {
+            override fun now(): Instant = testDateTime.minus(5.minutes).instant
+        }.atZone(testDateTime.zone)
+        val provider = LocationSunState(
+            sunScheduleProvider = object: SunScheduleProvider {
+                var requests = 0
+                override fun getNextSunriseForLocation(coordinates: GeoCoordinates): ZonedDateTime {
+                    return testDateTime.plus((requests++).days)
+                }
+            },
+            stateScope = backgroundScope,
+            locationAccess = FakeLocationAccess(LocationState.Unknown(LocationError.Disabled)),
+        )
+
+        val results = provider.sunState.take(2).toList()
+        assertEquals(SunScheduleState.Initial, results[0])
+        val unknownResult = results[1]
+        assertTrue(unknownResult is SunScheduleState.Unknown)
+        assertEquals(6, unknownResult.centralUsSunrise.dayOfMonth)
+
+        advanceTimeBy(5.minutes)
+        runCurrent()
+        val newValue = provider.sunState.value
+        assertTrue(newValue is SunScheduleState.Unknown)
+        assertEquals(7, newValue.centralUsSunrise.dayOfMonth)
     }
 }
