@@ -17,13 +17,13 @@ jobs:
           distribution: oracle
       -
         name: Keystore Setup
-        run: echo "${{secrets.ANDROID_KEYSTORE_64}}" | base64 --decode > glassconsole.keystore
+        run: echo "${{secrets.ANDROID_KEYSTORE_64}}" | base64 --decode > sleeps.keystore
       -
         name: Test
         run: ./gradlew --no-daemon check
       -
         env:
-          ORG_GRADLE_PROJECT_signingFile: glassconsole.keystore
+          ORG_GRADLE_PROJECT_signingFile: sleeps.keystore
           ORG_GRADLE_PROJECT_signingKeyPassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ORG_GRADLE_PROJECT_signingStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ORG_GRADLE_PROJECT_signingAlias: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
@@ -34,13 +34,13 @@ jobs:
         uses: actions/upload-artifact@v2.3.1
         with:
           name: Android APK
-          path: build/output/GlassConsole-${{ github.ref_name }}.apk
+          path: build/output/android-${{ github.ref_name }}.apk
       -
         name: Archive Bundle
         uses: actions/upload-artifact@v2.3.1
         with:
           name: Android AAB
-          path: build/output/GlassConsole-${{ github.ref_name }}.aab
+          path: build/output/android-${{ github.ref_name }}.aab
       -
         name: Create Release
         id: create_release
@@ -59,8 +59,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/output/GlassConsole-${{ github.ref_name }}.aab
-          asset_name: GlassConsole-${{ github.ref_name }}.aab
+          asset_path: build/output/android-${{ github.ref_name }}.aab
+          asset_name: Sleeps-${{ github.ref_name }}.aab
           asset_content_type: application/octet-stream
       -
         name: Upload APK Release Asset
@@ -69,6 +69,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/output/GlassConsole-${{ github.ref_name }}.apk
-          asset_name: GlassConsole-${{ github.ref_name }}.apk
+          asset_path: build/output/android-${{ github.ref_name }}.apk
+          asset_name: Sleeps-${{ github.ref_name }}.apk
           asset_content_type: application/octet-stream
