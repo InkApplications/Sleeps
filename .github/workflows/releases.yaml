@@ -30,17 +30,24 @@ jobs:
         name: Build Android App
         run: ./gradlew --no-daemon assembleRelease bundleRelease -Pcommit=${{ github.sha }} -PversionName=${{ github.ref_name }} -PversionCode=$((($GITHUB_RUN_NUMBER * 10) + $GITHUB_RUN_ATTEMPT))
       -
+        name: Prepare Uploads
+        run: |
+          mkdir -p build
+          mkdir -p build/output
+          cp android/build/outputs/apk/release/android-release.apk build/output/Sleeps-${{ github.ref_name }}.apk
+          cp android/build/outputs/bundle/release/android-release.aab build/output/Sleeps-${{ github.ref_name }}.aab
+      -
         name: Archive APK
         uses: actions/upload-artifact@v2.3.1
         with:
           name: Android APK
-          path: build/output/android-${{ github.ref_name }}.apk
+          path: build/output/Sleeps-${{ github.ref_name }}.apk
       -
         name: Archive Bundle
         uses: actions/upload-artifact@v2.3.1
         with:
           name: Android AAB
-          path: build/output/android-${{ github.ref_name }}.aab
+          path: build/output/Sleeps-${{ github.ref_name }}.aab
       -
         name: Create Release
         id: create_release
@@ -50,8 +57,8 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref_name }}
-          draft: true
-          prerelease: false
+          draft: false
+          prerelease: true
       -
         name: Upload AAB Release Asset
         uses: actions/upload-release-asset@v1.0.2
