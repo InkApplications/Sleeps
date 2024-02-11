@@ -7,8 +7,8 @@ import ink.ui.structures.TextStyle
 import ink.ui.structures.elements.*
 import kotlin.time.Duration
 
-object NotificationSettings {
-    internal fun create(
+internal object NotificationSettingElements {
+    fun create(
         state: NotificationsState,
         notificationController: NotificationController,
     ): Array<UiElement> {

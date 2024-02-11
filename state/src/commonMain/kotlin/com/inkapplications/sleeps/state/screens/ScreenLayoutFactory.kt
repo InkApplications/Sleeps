@@ -3,7 +3,6 @@ package com.inkapplications.sleeps.state.screens
 import com.inkapplications.sleeps.state.notifications.NotificationController
 import com.inkapplications.sleeps.state.notifications.NotificationsState
 import com.inkapplications.sleeps.state.sun.SunScheduleState
-import ink.ui.structures.TextStyle
 import ink.ui.structures.elements.*
 import ink.ui.structures.layouts.CenteredElementLayout
 import ink.ui.structures.layouts.ScrollingListLayout
@@ -28,13 +27,8 @@ internal class ScreenLayoutFactory {
             )
             is SunScheduleState.Known -> ScrollingListLayout(
                 items = listOf(
-                    TextElement("Schedule", style = TextStyle.H1),
-                    TextElement("Sunrise: ${sunScheduleState.sunrise.localTime}"),
-                    TextElement(
-                        text = "Settings",
-                        style = TextStyle.H2,
-                    ),
-                    *NotificationSettings.create(notificationsState, notificationController)
+                    *ScheduleElements.create(sunScheduleState),
+                    *NotificationSettingElements.create(notificationsState, notificationController)
                 )
             )
         }
