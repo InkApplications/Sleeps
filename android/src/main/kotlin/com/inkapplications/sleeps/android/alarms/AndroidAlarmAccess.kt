@@ -2,6 +2,7 @@ package com.inkapplications.sleeps.android.alarms
 
 import android.app.AlarmManager
 import android.content.Context
+import android.os.Build
 import com.inkapplications.sleeps.android.createEditAlarmPendingIntent
 import com.inkapplications.sleeps.state.alarms.AlarmAccess
 import com.inkapplications.sleeps.state.alarms.AlarmId
@@ -17,7 +18,7 @@ class AndroidAlarmAccess(
 ): AlarmAccess {
     override fun addAlarm(id: AlarmId, time: Instant) {
         Kimchi.info("Adding Alarm $id at $time")
-        if (!alarmManager.canScheduleExactAlarms()) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || !alarmManager.canScheduleExactAlarms()) {
             Kimchi.error("Unable to schedule Exact Alarms")
             return
         }
