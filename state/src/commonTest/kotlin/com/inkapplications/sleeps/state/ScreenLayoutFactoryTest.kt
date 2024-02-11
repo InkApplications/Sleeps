@@ -23,9 +23,6 @@ class ScreenLayoutFactoryTest {
 
     @Test
     fun initialLoading() {
-        assertTrue(factory.initial is CenteredElementLayout)
-        assertTrue(factory.initial.body is ProgressElement.Indeterminate)
-
         val layout = factory.create(
             sunScheduleState = SunScheduleState.Initial,
             notificationsState = NotificationsState.Initial,

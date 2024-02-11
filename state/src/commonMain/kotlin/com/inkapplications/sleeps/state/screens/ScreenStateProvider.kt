@@ -30,5 +30,5 @@ internal class ScreenStateProvider(
             notificationsState = notificationState,
             notificationController = notificationController,
         )
-    }.stateIn(stateScope, SharingStarted.WhileSubscribed(), screenLayoutFactory.initial)
+    }.stateIn(stateScope, SharingStarted.WhileSubscribed(), LoadingScreen)
 }
