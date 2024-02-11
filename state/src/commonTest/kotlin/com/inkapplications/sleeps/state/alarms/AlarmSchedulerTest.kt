@@ -48,7 +48,8 @@ class AlarmSchedulerTest {
         runCurrent()
 
         assertEquals(2, alarmAccess.clearCalls.size, "Should clear existing alarms")
-        assertEquals("wake", alarmAccess.clearCalls[0].value)
+        assertNotNull(alarmAccess.clearCalls.find { it.value == "wake" }, " Wake alarm should be cleared")
+        assertNotNull(alarmAccess.clearCalls.find { it.value == "sleep" }, " Sleep alarm should be cleared")
         assertEquals(2, alarmAccess.addCalls.size)
 
         val wakeAlarm = alarmAccess.addCalls.find { it.first.value == "wake" }?.second
@@ -92,7 +93,8 @@ class AlarmSchedulerTest {
         runCurrent()
 
         assertEquals(2, alarmAccess.clearCalls.size, "Should clear existing alarms")
-        assertEquals("wake", alarmAccess.clearCalls[0].value)
+        assertNotNull(alarmAccess.clearCalls.find { it.value == "wake" }, " Wake alarm should be cleared")
+        assertNotNull(alarmAccess.clearCalls.find { it.value == "sleep" }, " Sleep alarm should be cleared")
         assertEquals(2, alarmAccess.addCalls.size)
 
         val wakeAlarm = alarmAccess.addCalls.find { it.first.value == "wake" }?.second
