@@ -32,7 +32,7 @@ internal class JvmSunScheduleProvider(
 
         val todaySunrise = calculator.getOfficialSunriseCalendarForDate(calendar)
 
-        val sunrise = if (todaySunrise.timeInMillis > clock.now().toEpochMilliseconds()) {
+        val sunrise = if (todaySunrise.timeInMillis < clock.now().toEpochMilliseconds()) {
             calendar.add(Calendar.DATE, 1)
             calculator.getOfficialSunriseCalendarForDate(calendar)
         } else todaySunrise
