@@ -60,7 +60,7 @@ class ApplicationModule(
         logWriter = defaultWriter,
     )
 
-    val screenState = stateModule.screenState
+    val screens = stateModule.screenProvider
     val initRunner = stateModule.init
     val alarmExecutor = stateModule.alarmController
     val bootController = stateModule.bootController

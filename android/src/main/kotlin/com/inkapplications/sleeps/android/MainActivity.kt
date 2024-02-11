@@ -27,7 +27,7 @@ class MainActivity: ComponentActivity() {
             }.launch(Permissions)
 
             setContent {
-                ComposeRenderer(getRenderTheme()).render(screenState.collectAsState().value)
+                ComposeRenderer(getRenderTheme()).render(screens.screenState.collectAsState().value)
             }
         }
     }

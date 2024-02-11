@@ -3,26 +3,23 @@ package com.inkapplications.sleeps.state
 import app.cash.sqldelight.db.SqlDriver
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.alarms.*
-import com.inkapplications.sleeps.state.alarms.AlarmScheduler
-import com.inkapplications.sleeps.state.alarms.BeepingAlarmController
 import com.inkapplications.sleeps.state.notifications.DatabaseNotificationStateAccess
+import com.inkapplications.sleeps.state.screens.ScreenLayoutFactory
+import com.inkapplications.sleeps.state.screens.ScreenState
+import com.inkapplications.sleeps.state.screens.ScreenStateProvider
 import com.inkapplications.sleeps.state.settings.AlarmSettings
 import com.inkapplications.sleeps.state.settings.MinutesDurationAdapter
 import com.inkapplications.sleeps.state.settings.Settings
-import com.inkapplications.sleeps.state.sun.SunScheduleProvider
 import com.inkapplications.sleeps.state.sun.LocationSunState
+import com.inkapplications.sleeps.state.sun.SunScheduleProvider
 import kimchi.Kimchi
 import kimchi.logger.LogWriter
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import regolith.init.Initializer
 import regolith.init.RegolithInitRunner
 import regolith.processes.daemon.DaemonInitializer
 import regolith.sensors.location.LocationAccess
-import kotlin.time.Duration.Companion.milliseconds
 
 class StateModule(
     locationAccess: LocationAccess,
@@ -56,24 +53,15 @@ class StateModule(
         alarmSettings = settingsDatabase.alarmSettingsQueries,
     )
 
-    private val waiter = flow {
-        delay(400.milliseconds)
-        emit(true)
-    }
-
     private val screenLayoutFactory = ScreenLayoutFactory()
 
-    val screenState = combine(
-        sunStateProvider.sunState,
-        notificationStateAccess.notificationsState,
-        waiter,
-    ) { sunScheduleState, notificationState, _ ->
-        screenLayoutFactory.create(
-            sunScheduleState = sunScheduleState,
-            notificationsState = notificationState,
-            notificationController = notificationStateAccess,
-        )
-    }.stateIn(stateScope, SharingStarted.WhileSubscribed(), screenLayoutFactory.initial)
+    val screenProvider: ScreenState = ScreenStateProvider(
+        sunStateProvider = sunStateProvider,
+        notificationStateAccess = notificationStateAccess,
+        notificationController = notificationStateAccess,
+        screenLayoutFactory = screenLayoutFactory,
+        stateScope = stateScope,
+    )
 
     private val alarmScheduler = AlarmScheduler(
         alarmAccess = alarmAccess,

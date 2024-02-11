@@ -1,4 +1,4 @@
-package com.inkapplications.sleeps.state
+package com.inkapplications.sleeps.state.screens
 
 import com.inkapplications.sleeps.state.notifications.NotificationController
 import com.inkapplications.sleeps.state.notifications.NotificationsState
