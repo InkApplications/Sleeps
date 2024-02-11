@@ -16,29 +16,29 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(kotlinLibraries.coroutines.core)
-                implementation(inkLibraries.regolith.processes)
-                implementation(thirdParty.sqldelight.coroutines)
-                api(inkLibraries.regolith.init)
-                api(inkLibraries.regolith.sensors)
-                api(inkLibraries.ui.structures)
-                api(inkLibraries.spondee.units)
-                api(inkLibraries.watermelon.datetime)
-                api(inkLibraries.kimchi.core)
-                api(kotlinLibraries.kotlinx.datetime)
+                implementation(libs.coroutines.core)
+                implementation(libs.regolith.processes)
+                implementation(libs.sqldelight.coroutines)
+                api(libs.regolith.init)
+                api(libs.regolith.sensors)
+                api(libs.ui.structures)
+                api(libs.spondee.units)
+                api(libs.watermelon.datetime)
+                api(libs.kimchi.core)
+                api(libs.kotlinx.datetime)
             }
         }
 
         val jvmMain by getting {
             dependencies {
-                implementation(thirdParty.sunrisesunsetcalculator)
+                implementation(libs.sunrisesunsetcalculator)
             }
         }
 
         val commonTest by getting {
             dependencies {
-                implementation(kotlinLibraries.coroutines.test)
-                implementation(kotlinLibraries.kotlin.test.core)
+                implementation(libs.coroutines.test)
+                implementation(libs.kotlin.test.core)
             }
         }
     }
