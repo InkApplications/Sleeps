@@ -26,7 +26,7 @@ internal class JvmSunScheduleProvider(
             date.zone.id,
         )
         calendar.set(Calendar.YEAR, date.year)
-        calendar.set(Calendar.MONTH, date.monthNumber)
+        calendar.set(Calendar.MONTH, date.monthNumber - 1)
         calendar.set(Calendar.DAY_OF_MONTH, date.dayOfMonth)
         calendar.timeZone = JavaTimeZone.getTimeZone(date.zone.id)
 

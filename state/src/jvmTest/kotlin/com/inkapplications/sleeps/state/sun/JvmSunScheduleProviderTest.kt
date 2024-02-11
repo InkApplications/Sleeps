@@ -21,7 +21,10 @@ class JvmSunScheduleProviderTest {
         )
 
         assertEquals(7, schedule.hour)
-        assertEquals(0, schedule.minute)
+        assertEquals(20, schedule.minute)
         assertEquals(0, schedule.second)
+        assertEquals(1, schedule.monthNumber)
+        assertEquals(7, schedule.dayOfMonth)
+        assertEquals(2024, schedule.year)
     }
 }
