@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.21"
+kotlin = "1.9.22"
 coroutines = "1.7.3"
 core-ktx = "1.9.0"
 lifecycle-runtime-ktx = "2.6.1"
