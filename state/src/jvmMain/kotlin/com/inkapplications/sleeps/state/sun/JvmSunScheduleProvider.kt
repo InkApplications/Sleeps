@@ -1,14 +1,14 @@
 package com.inkapplications.sleeps.state.sun
 
 import com.inkapplications.datetime.ZonedClock
-import com.inkapplications.datetime.ZonedDate
 import com.inkapplications.datetime.ZonedDateTime
 import com.inkapplications.datetime.atZone
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator
 import com.luckycatlabs.sunrisesunset.dto.Location
 import inkapplications.spondee.spatial.GeoCoordinates
-import kotlinx.datetime.*
-import java.util.Calendar
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toLocalDateTime
+import java.util.*
 import java.util.TimeZone as JavaTimeZone
 
 internal class JvmSunScheduleProvider(

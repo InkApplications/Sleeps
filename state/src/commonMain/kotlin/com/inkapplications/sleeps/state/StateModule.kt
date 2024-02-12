@@ -3,14 +3,15 @@ package com.inkapplications.sleeps.state
 import app.cash.sqldelight.db.SqlDriver
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.alarms.*
-import com.inkapplications.sleeps.state.notifications.DatabaseNotificationStateAccess
+import com.inkapplications.sleeps.state.notifications.DatabaseNotificationSettingsAccess
+import com.inkapplications.sleeps.state.schedule.SettingsDrivenScheduleAccess
 import com.inkapplications.sleeps.state.screens.ScreenLayoutFactory
 import com.inkapplications.sleeps.state.screens.ScreenState
 import com.inkapplications.sleeps.state.screens.ScreenStateProvider
 import com.inkapplications.sleeps.state.settings.AlarmSettings
 import com.inkapplications.sleeps.state.settings.MinutesDurationAdapter
 import com.inkapplications.sleeps.state.settings.Settings
-import com.inkapplications.sleeps.state.sun.LocationSunState
+import com.inkapplications.sleeps.state.sun.LocationSunriseAccess
 import com.inkapplications.sleeps.state.sun.SunScheduleProvider
 import kimchi.Kimchi
 import kimchi.logger.LogWriter
@@ -34,7 +35,7 @@ class StateModule(
 ) {
     private val kimchi = Kimchi.apply { addLog(logWriter) }
     private val kimchiRegolithAdapter = KimchiRegolithAdapter(kimchi)
-    private val sunStateProvider = LocationSunState(
+    private val sunriseAccess = LocationSunriseAccess(
         sunScheduleProvider = sunScheduleProvider,
         stateScope = stateScope,
         locationAccess = locationAccess,
@@ -49,23 +50,28 @@ class StateModule(
         )
     )
 
-    private val notificationStateAccess = DatabaseNotificationStateAccess(
+    private val notificationStateAccess = DatabaseNotificationSettingsAccess(
         alarmSettings = settingsDatabase.alarmSettingsQueries,
     )
 
     private val screenLayoutFactory = ScreenLayoutFactory()
 
+    private val scheduleAccess = SettingsDrivenScheduleAccess(
+        sunriseAccess = sunriseAccess,
+        notificationSettings = notificationStateAccess,
+    )
+
     val screenProvider: ScreenState = ScreenStateProvider(
-        sunStateProvider = sunStateProvider,
-        notificationStateAccess = notificationStateAccess,
+        notificationSettingsAccess = notificationStateAccess,
         notificationController = notificationStateAccess,
         screenLayoutFactory = screenLayoutFactory,
+        scheduleAccess = scheduleAccess,
         stateScope = stateScope,
     )
 
     private val alarmScheduler = AlarmScheduler(
         alarmAccess = alarmAccess,
-        sunScheduleAccess = sunStateProvider,
+        scheduleAccess = scheduleAccess,
         notificationSettings = notificationStateAccess,
         logger = kimchi,
     )

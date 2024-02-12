@@ -1,7 +1,7 @@
 package com.inkapplications.sleeps.state.screens
 
 import com.inkapplications.sleeps.state.notifications.NotificationController
-import com.inkapplications.sleeps.state.notifications.NotificationsState
+import com.inkapplications.sleeps.state.notifications.NotificationSettings
 import ink.ui.structures.GroupingStyle
 import ink.ui.structures.TextStyle
 import ink.ui.structures.elements.*
@@ -9,26 +9,23 @@ import kotlin.time.Duration
 
 internal object NotificationSettingElements {
     fun create(
-        state: NotificationsState,
+        state: NotificationSettings,
         notificationController: NotificationController,
     ): Array<UiElement> {
-        return when (state) {
-            is NotificationsState.Configured -> arrayOf(
-                ElementList(
-                    items = createWakeAlarmSettings(state, notificationController),
-                    groupingStyle = GroupingStyle.Unified,
-                ),
-                ElementList(
-                    items = createSleepAlarmSettings(state, notificationController),
-                    groupingStyle = GroupingStyle.Unified,
-                ),
-            )
-            NotificationsState.Initial -> emptyArray()
-        }
+        return arrayOf(
+            ElementList(
+                items = createWakeAlarmSettings(state, notificationController),
+                groupingStyle = GroupingStyle.Unified,
+            ),
+            ElementList(
+                items = createSleepAlarmSettings(state, notificationController),
+                groupingStyle = GroupingStyle.Unified,
+            ),
+        )
     }
 
     private fun createWakeAlarmSettings(
-        state: NotificationsState.Configured,
+        state: NotificationSettings,
         notificationController: NotificationController,
     ): List<UiElement> {
         val alarmHeading = TextElement(
@@ -60,7 +57,7 @@ internal object NotificationSettingElements {
     private fun Duration.format() = (inWholeMinutes / 60f).toString()
 
     private fun createSleepAlarmSettings(
-        state: NotificationsState.Configured,
+        state: NotificationSettings,
         notificationController: NotificationController,
     ): List<UiElement> {
 

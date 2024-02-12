@@ -1,16 +1,16 @@
 package com.inkapplications.sleeps.state.screens
 
 import com.inkapplications.sleeps.state.notifications.NotificationController
-import com.inkapplications.sleeps.state.notifications.NotificationStateAccess
-import com.inkapplications.sleeps.state.sun.SunScheduleStateAccess
+import com.inkapplications.sleeps.state.notifications.NotificationSettingsAccess
+import com.inkapplications.sleeps.state.schedule.SettingsDrivenScheduleAccess
 import ink.ui.structures.layouts.UiLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlin.time.Duration.Companion.milliseconds
 
 internal class ScreenStateProvider(
-    sunStateProvider: SunScheduleStateAccess,
-    notificationStateAccess: NotificationStateAccess,
+    scheduleAccess: SettingsDrivenScheduleAccess,
+    notificationSettingsAccess: NotificationSettingsAccess,
     notificationController: NotificationController,
     screenLayoutFactory: ScreenLayoutFactory,
     stateScope: CoroutineScope,
@@ -21,12 +21,12 @@ internal class ScreenStateProvider(
     }
 
     override val screenState: StateFlow<UiLayout> = combine(
-        sunStateProvider.sunState,
-        notificationStateAccess.notificationsState,
+        scheduleAccess.schedule,
+        notificationSettingsAccess.notificationsState,
         waiter,
-    ) { sunScheduleState, notificationState, _ ->
+    ) { schedule, notificationState, _ ->
         screenLayoutFactory.create(
-            sunScheduleState = sunScheduleState,
+            schedule = schedule,
             notificationsState = notificationState,
             notificationController = notificationController,
         )
