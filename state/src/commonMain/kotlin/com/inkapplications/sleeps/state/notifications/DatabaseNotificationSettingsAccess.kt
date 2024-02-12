@@ -7,9 +7,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlin.time.Duration.Companion.minutes
 
-internal class DatabaseNotificationStateAccess(
+internal class DatabaseNotificationSettingsAccess(
     private val alarmSettings: AlarmSettingsQueries,
-): NotificationStateAccess, NotificationController {
+): NotificationSettingsAccess, NotificationController {
     private val marginIncrements = 15.minutes
     private val targetIncrements = 30.minutes
 
@@ -17,7 +17,7 @@ internal class DatabaseNotificationStateAccess(
         .asFlow()
         .mapToOne(Dispatchers.IO)
         .map {
-            NotificationsState.Configured(
+            NotificationSettings(
                 sleepNotifications = it.sleep_alarm,
                 wakeAlarm = it.wake_alarm,
                 alarmMargin = it.alarm_margin,

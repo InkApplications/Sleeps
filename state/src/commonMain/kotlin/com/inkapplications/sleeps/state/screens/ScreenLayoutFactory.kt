@@ -1,10 +1,8 @@
 package com.inkapplications.sleeps.state.screens
 
 import com.inkapplications.sleeps.state.notifications.NotificationController
-import com.inkapplications.sleeps.state.notifications.NotificationsState
-import com.inkapplications.sleeps.state.sun.SunScheduleState
-import ink.ui.structures.elements.*
-import ink.ui.structures.layouts.CenteredElementLayout
+import com.inkapplications.sleeps.state.notifications.NotificationSettings
+import com.inkapplications.sleeps.state.schedule.Schedule
 import ink.ui.structures.layouts.ScrollingListLayout
 import ink.ui.structures.layouts.UiLayout
 
@@ -16,21 +14,15 @@ internal class ScreenLayoutFactory {
      * Create a screen layout for the given state fields.
      */
     fun create(
-        sunScheduleState: SunScheduleState,
-        notificationsState: NotificationsState,
+        schedule: Schedule,
+        notificationsState: NotificationSettings,
         notificationController: NotificationController,
     ): UiLayout {
-        return when (sunScheduleState) {
-            SunScheduleState.Initial -> LoadingScreen
-            is SunScheduleState.Unknown -> CenteredElementLayout(
-                body = TextElement("Unknown"),
+        return ScrollingListLayout(
+            items = listOf(
+                *ScheduleElements.create(schedule),
+                *NotificationSettingElements.create(notificationsState, notificationController)
             )
-            is SunScheduleState.Known -> ScrollingListLayout(
-                items = listOf(
-                    *ScheduleElements.create(sunScheduleState),
-                    *NotificationSettingElements.create(notificationsState, notificationController)
-                )
-            )
-        }
+        )
     }
 }

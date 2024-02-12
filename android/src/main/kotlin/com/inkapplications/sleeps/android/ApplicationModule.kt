@@ -7,8 +7,8 @@ import android.location.LocationManager
 import androidx.core.location.LocationRequestCompat
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.inkapplications.sleeps.android.alarms.AlarmBeeper
-import com.inkapplications.sleeps.android.alarms.AndroidAlarmAccess
 import com.inkapplications.sleeps.android.alarms.AlarmNotifications
+import com.inkapplications.sleeps.android.alarms.AndroidAlarmAccess
 import com.inkapplications.sleeps.state.createJvmStateModule
 import com.inkapplications.sleeps.state.settings.Settings
 import kimchi.logger.defaultWriter
