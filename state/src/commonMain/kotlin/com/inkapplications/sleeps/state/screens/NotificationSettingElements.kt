@@ -13,6 +13,10 @@ internal object NotificationSettingElements {
         notificationController: NotificationController,
     ): Array<UiElement> {
         return arrayOf(
+            TextElement(
+                text = "Settings",
+                style = TextStyle.H2,
+            ),
             ElementList(
                 items = createWakeAlarmSettings(state, notificationController),
                 groupingStyle = GroupingStyle.Unified,
