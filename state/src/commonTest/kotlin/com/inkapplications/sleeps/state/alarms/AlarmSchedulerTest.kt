@@ -9,6 +9,8 @@ import kimchi.logger.EmptyLogger
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
@@ -25,10 +27,13 @@ class AlarmSchedulerTest {
         sleepTarget = INFINITE,
     )
     private val fakeSchedule = Schedule(
-        sunrise = LocalDateTime(2021, 1, 1, 12, 0).atZone(TimeZone.UTC),
-        wake = LocalDateTime(2021, 1, 1, 12, 1).atZone(TimeZone.UTC),
-        sleep = LocalDateTime(2021, 1, 1, 12, 2).atZone(TimeZone.UTC),
+        sunrise = LocalDateTime(2021, 1, 2, 6, 0).atZone(TimeZone.UTC),
+        wake = LocalDateTime(2021, 1, 2, 7, 1).atZone(TimeZone.UTC),
+        sleep = LocalDateTime(2021, 1, 1, 20, 2).atZone(TimeZone.UTC),
     )
+    val afternoonBefore = object: Clock {
+        override fun now(): Instant  = LocalDateTime(2021, 1, 1, 20, 0).atZone(TimeZone.UTC).instant
+    }
 
     @Test
     fun alarmSchedule() = runTest {
@@ -39,6 +44,7 @@ class AlarmSchedulerTest {
             alarmAccess = alarmAccess,
             scheduleAccess = fakeScheduleAccess,
             notificationSettings = notificationSettings,
+            clock = afternoonBefore,
             logger = EmptyLogger
         )
 
@@ -63,17 +69,17 @@ class AlarmSchedulerTest {
         val wakeAlarm = alarmAccess.addCalls.find { it.first.value == "wake" }?.second
         assertNotNull(wakeAlarm, "Wake alarm should be scheduled")
         assertEquals(
-            LocalDateTime(2021, 1, 1, 12, 1).atZone(TimeZone.UTC).instant,
+            LocalDateTime(2021, 1, 2, 7, 1).atZone(TimeZone.UTC).instant,
             wakeAlarm,
-            "Alarm is scheduled 10 mins before sunrise"
+            "Alarm is scheduled"
         )
 
         val sleepAlarm = alarmAccess.addCalls.find { it.first.value == "sleep" }?.second
         assertNotNull(sleepAlarm, "Sleep alarm should be scheduled")
         assertEquals(
-            LocalDateTime(2021, 1, 1, 12, 2).atZone(TimeZone.UTC).instant,
+            LocalDateTime(2021, 1, 1, 20, 2).atZone(TimeZone.UTC).instant,
             sleepAlarm,
-            "Sleep Notification is scheduled 1hr before sunrise"
+            "Sleep Notification is scheduled"
         )
 
         job.cancel()
@@ -88,6 +94,7 @@ class AlarmSchedulerTest {
             alarmAccess = alarmAccess,
             scheduleAccess = fakeScheduleAccess,
             notificationSettings = notificationsFake,
+            clock = afternoonBefore,
             logger = EmptyLogger,
         )
 
@@ -105,6 +112,40 @@ class AlarmSchedulerTest {
 
         assertEquals(2, alarmAccess.clearCalls.size, "Should clear existing alarms when disabled")
         assertEquals(0, alarmAccess.addCalls.size, "Should not set any alarms when disabled")
+
+        job.cancel()
+    }
+
+    @Test
+    fun midCycle() = runTest {
+        val notificationSettings = NotificationSettingsFake()
+        val fakeScheduleAccess = ScheduleAccessFake()
+        val alarmAccess = AlarmAccessSpy()
+        val alarmScheduler = AlarmScheduler(
+            alarmAccess = alarmAccess,
+            scheduleAccess = fakeScheduleAccess,
+            notificationSettings = notificationSettings,
+            clock = object: Clock {
+                override fun now(): Instant  = LocalDateTime(2021, 1, 1, 21, 2).atZone(TimeZone.UTC).instant
+            },
+            logger = EmptyLogger
+        )
+
+        val job = launch {
+            alarmScheduler.startDaemon()
+        }
+
+        runCurrent()
+
+        assertEquals(0, alarmAccess.addCalls.size, "No calls before schedule is updated")
+        assertEquals(0, alarmAccess.clearCalls.size, "No calls before schedule is updated")
+
+        notificationSettings.notificationsState.emit(fakeConfig)
+        fakeScheduleAccess.schedule.emit(fakeSchedule)
+        runCurrent()
+
+        val sleepAlarms = alarmAccess.addCalls.count { it.first.value == "sleep" }
+        assertEquals(0, sleepAlarms, "No sleep alarms scheduled after initial time")
 
         job.cancel()
     }

@@ -73,6 +73,7 @@ class StateModule(
         alarmAccess = alarmAccess,
         scheduleAccess = scheduleAccess,
         notificationSettings = notificationStateAccess,
+        clock = clock,
         logger = kimchi,
     )
 

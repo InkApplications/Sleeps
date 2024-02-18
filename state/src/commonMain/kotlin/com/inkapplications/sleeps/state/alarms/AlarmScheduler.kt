@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
 import regolith.processes.daemon.Daemon
 import regolith.processes.daemon.DaemonRunAttempt
 import regolith.processes.daemon.FailureSignal
@@ -21,6 +22,7 @@ internal class AlarmScheduler(
     private val alarmAccess: AlarmAccess,
     notificationSettings: NotificationSettingsAccess,
     scheduleAccess: ScheduleAccess,
+    private val clock: Clock,
     private val logger: KimchiLogger,
 ): Daemon, DeviceBootController {
     private val wakeAlarm = AlarmId("wake")
@@ -57,11 +59,10 @@ internal class AlarmScheduler(
             logger.trace("Wake alarm disabled")
         }
 
-        if (alarmParameters.settings.sleepNotifications) {
-            logger.trace("Scheduling Sleep alarm for ${alarmParameters.schedule.sleep}")
-            alarmAccess.addAlarm(sleepAlarm, alarmParameters.schedule.sleep.instant)
-        } else {
-            logger.trace("Sleep alarm disabled")
+        when {
+            !alarmParameters.settings.sleepNotifications -> logger.trace("Sleep alarm disabled")
+            clock.now() > alarmParameters.schedule.sleep.instant -> logger.trace("Sleep alarm time has passed")
+            else -> alarmAccess.addAlarm(sleepAlarm, alarmParameters.schedule.sleep.instant)
         }
     }
 
