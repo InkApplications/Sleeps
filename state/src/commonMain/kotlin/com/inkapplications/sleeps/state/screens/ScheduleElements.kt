@@ -9,11 +9,9 @@ internal object ScheduleElements {
     fun create(schedule: Schedule): Array<UiElement> {
         return arrayOf(
             TextElement("Schedule", style = TextStyle.H1),
+            TextElement("Wake: ${schedule.wake.localTime}"),
             TextElement("Sunrise: ${schedule.sunrise.localTime}"),
-            TextElement(
-                text = "Settings",
-                style = TextStyle.H2,
-            )
+            TextElement("Sleep: ${schedule.sleep.localTime}"),
         )
     }
 }
