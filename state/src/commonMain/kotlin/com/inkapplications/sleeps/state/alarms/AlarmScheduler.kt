@@ -49,18 +49,20 @@ internal class AlarmScheduler(
 
     private fun scheduleAlarm(alarmParameters: AlarmParameters) {
         logger.trace("Removing all alarms")
-        alarmAccess.removeAlarm(wakeAlarm)
-        alarmAccess.removeAlarm(sleepAlarm)
 
         if (alarmParameters.settings.wakeAlarm) {
             logger.trace("Scheduling Wake alarm for ${alarmParameters.schedule.wake}")
             alarmAccess.addAlarm(wakeAlarm, alarmParameters.schedule.wake.instant)
         } else {
             logger.trace("Wake alarm disabled")
+            alarmAccess.removeAlarm(wakeAlarm)
         }
 
         when {
-            !alarmParameters.settings.sleepNotifications -> logger.trace("Sleep alarm disabled")
+            !alarmParameters.settings.sleepNotifications -> {
+                logger.trace("Sleep alarm disabled")
+                alarmAccess.removeAlarm(sleepAlarm)
+            }
             clock.now() > alarmParameters.schedule.sleep.instant -> logger.trace("Sleep alarm time has passed")
             else -> alarmAccess.addAlarm(sleepAlarm, alarmParameters.schedule.sleep.instant)
         }
