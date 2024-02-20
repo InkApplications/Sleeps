@@ -7,6 +7,6 @@ interface AlarmController {
     /**
      * Start any operations that should be performed when an alarm goes off.
      */
-    suspend fun onStartAlarm(id: AlarmId)
+    suspend fun onStartAlarm(id: AlarmType)
 }
 

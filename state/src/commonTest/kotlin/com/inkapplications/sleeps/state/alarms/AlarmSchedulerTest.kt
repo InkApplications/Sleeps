@@ -64,7 +64,7 @@ class AlarmSchedulerTest {
         assertEquals(0, alarmAccess.clearCalls.size, "Should not clear alarms")
         assertEquals(2, alarmAccess.addCalls.size)
 
-        val wakeAlarm = alarmAccess.addCalls.find { it.first.value == "wake" }?.second
+        val wakeAlarm = alarmAccess.addCalls.find { it.first.id == "wake" }?.second
         assertNotNull(wakeAlarm, "Wake alarm should be scheduled")
         assertEquals(
             LocalDateTime(2021, 1, 2, 7, 1).atZone(TimeZone.UTC).instant,
@@ -72,7 +72,7 @@ class AlarmSchedulerTest {
             "Alarm is scheduled"
         )
 
-        val sleepAlarm = alarmAccess.addCalls.find { it.first.value == "sleep" }?.second
+        val sleepAlarm = alarmAccess.addCalls.find { it.first.id == "sleep" }?.second
         assertNotNull(sleepAlarm, "Sleep alarm should be scheduled")
         assertEquals(
             LocalDateTime(2021, 1, 1, 20, 2).atZone(TimeZone.UTC).instant,
@@ -109,8 +109,8 @@ class AlarmSchedulerTest {
         runCurrent()
 
         assertEquals(2, alarmAccess.clearCalls.size, "Should clear existing alarms when disabled")
-        assertNotNull(alarmAccess.clearCalls.find { it.value == "wake" }, " Wake alarm should be cleared")
-        assertNotNull(alarmAccess.clearCalls.find { it.value == "sleep" }, " Sleep alarm should be cleared")
+        assertNotNull(alarmAccess.clearCalls.find { it.id == "wake" }, " Wake alarm should be cleared")
+        assertNotNull(alarmAccess.clearCalls.find { it.id == "sleep" }, " Sleep alarm should be cleared")
         assertEquals(0, alarmAccess.addCalls.size, "Should not set any alarms when disabled")
 
         job.cancel()
@@ -144,7 +144,7 @@ class AlarmSchedulerTest {
         fakeScheduleAccess.schedule.emit(fakeSchedule)
         runCurrent()
 
-        val sleepAlarms = alarmAccess.addCalls.count { it.first.value == "sleep" }
+        val sleepAlarms = alarmAccess.addCalls.count { it.first.id == "sleep" }
         assertEquals(0, sleepAlarms, "No sleep alarms scheduled after initial time")
 
         job.cancel()

@@ -13,7 +13,7 @@ internal class BeepingAlarmController(
     private val minimumDelay = 3.seconds
     private val acceleration = 0.9
 
-    override suspend fun onStartAlarm(id: AlarmId) {
+    override suspend fun onStartAlarm(id: AlarmType) {
         var current = initialDelay
         while (currentCoroutineContext().isActive) {
             beeper.play()
