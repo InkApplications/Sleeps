@@ -25,9 +25,6 @@ internal class AlarmScheduler(
     private val clock: Clock,
     private val logger: KimchiLogger,
 ): Daemon, DeviceBootController {
-    private val wakeAlarm = AlarmId("wake")
-    private val sleepAlarm = AlarmId("sleep")
-
     private val alarmParameters = combine(
         scheduleAccess.schedule,
         notificationSettings.notificationsState,
@@ -52,19 +49,19 @@ internal class AlarmScheduler(
 
         if (alarmParameters.settings.wakeAlarm) {
             logger.trace("Scheduling Wake alarm for ${alarmParameters.schedule.wake}")
-            alarmAccess.addAlarm(wakeAlarm, alarmParameters.schedule.wake.instant)
+            alarmAccess.addAlarm(AlarmType.Wake, alarmParameters.schedule.wake.instant)
         } else {
             logger.trace("Wake alarm disabled")
-            alarmAccess.removeAlarm(wakeAlarm)
+            alarmAccess.removeAlarm(AlarmType.Wake)
         }
 
         when {
             !alarmParameters.settings.sleepNotifications -> {
                 logger.trace("Sleep alarm disabled")
-                alarmAccess.removeAlarm(sleepAlarm)
+                alarmAccess.removeAlarm(AlarmType.Sleep)
             }
             clock.now() > alarmParameters.schedule.sleep.instant -> logger.trace("Sleep alarm time has passed")
-            else -> alarmAccess.addAlarm(sleepAlarm, alarmParameters.schedule.sleep.instant)
+            else -> alarmAccess.addAlarm(AlarmType.Sleep, alarmParameters.schedule.sleep.instant)
         }
     }
 

@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import com.inkapplications.sleeps.android.SleepApplication
-import com.inkapplications.sleeps.state.alarms.AlarmId
+import com.inkapplications.sleeps.state.alarms.AlarmType
 import kimchi.Kimchi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -23,7 +23,7 @@ private const val AlarmIdExtra = "alarm.id"
 class AlarmService: Service() {
     private var job: Job? = Job()
 
-    private val Intent.alarmId get() = getStringExtra(AlarmIdExtra)!!.let(::AlarmId)
+    private val Intent.alarmId get() = getStringExtra(AlarmIdExtra).let(AlarmType::findById)
 
     override fun onBind(intent: Intent): IBinder? = null
 
@@ -37,12 +37,12 @@ class AlarmService: Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun start(alarmId: AlarmId) = with (SleepApplication.module) {
+    private fun start(alarm: AlarmType) = with (SleepApplication.module) {
         job?.cancel()
         startForeground(NotificationId, notifications.createAlarmNotification())
         job = backgroundScope.launch {
             beeper.prepare()
-            alarmExecutor.onStartAlarm(alarmId)
+            alarmExecutor.onStartAlarm(alarm)
         }
     }
 
@@ -69,8 +69,8 @@ fun Context.createStopAlarmServicePendingIntent(): PendingIntent = PendingIntent
  * Create an intent that can be used to start the alarm service.
  */
 fun Context.createStartAlarmServiceIntent(
-    id: AlarmId,
+    alarm: AlarmType,
 ): Intent = Intent(this, AlarmService::class.java).apply {
     action = StartAction
-    putExtra(AlarmIdExtra, id.value)
+    putExtra(AlarmIdExtra, alarm.id)
 }
