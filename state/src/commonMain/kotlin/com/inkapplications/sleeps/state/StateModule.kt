@@ -27,6 +27,7 @@ class StateModule(
     sunScheduleProvider: SunScheduleProvider,
     alarmAccess: AlarmAccess,
     beeper: AlarmBeeper,
+    maintenanceScheduler: MaintenanceScheduler,
     logWriter: LogWriter,
     initializers: List<Initializer>,
     settingsDriver: SqlDriver,
@@ -92,7 +93,11 @@ class StateModule(
         beeper = beeper,
     )
 
-    val bootController: DeviceBootController = alarmScheduler
+    val bootController: DeviceBootController = MaintenanceBootController(
+        maintenanceScheduler = maintenanceScheduler,
+    )
+
+    val maintenanceController: MaintenanceController = alarmScheduler
 
     val init = RegolithInitRunner(
         initializers = initializers + internalInitializers,

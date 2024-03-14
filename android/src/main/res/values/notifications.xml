@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="notifications_channel_alarm_name">Alarms</string>
+    <string name="notifications_channel_maintenance_name">Background</string>
     <string name="notifications_alarm_title">Wake Up!</string>
     <string name="notifications_alarm_content">Sunrise is at %s</string>
 </resources>

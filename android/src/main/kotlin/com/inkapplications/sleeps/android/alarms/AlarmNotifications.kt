@@ -20,7 +20,7 @@ class AlarmNotifications(
     private val notificationManager: NotificationManager,
 ): Initializer {
     override suspend fun initialize(targetManager: TargetManager) {
-        createNotificationChannel()
+        createNotificationChannels()
     }
 
     /**
@@ -37,14 +37,37 @@ class AlarmNotifications(
             .build()
     }
 
-    private fun createNotificationChannel() {
+    /**
+     * Create a notification to display when the alarm is going off.
+     */
+    fun createMaintenanceNotification(): Notification {
+        return context.createNotificationBuilder(AlarmChannelId)
+            .setContentTitle("Scheduling Alarms")
+            .setSmallIcon(R.drawable.ic_alarm_confirm)
+            .setProgress(0, 0, true)
+            .setSound(null)
+            .setPriority(Notification.PRIORITY_LOW)
+            .build()
+    }
+
+    private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        val channel = NotificationChannel(
+
+        val alarmChannel = NotificationChannel(
             AlarmChannelId,
             context.getString(R.string.notifications_channel_alarm_name),
             NotificationManager.IMPORTANCE_HIGH,
         )
-        channel.setSound(null, null)
-        notificationManager.createNotificationChannel(channel)
+        val maintenanceChannel = NotificationChannel(
+            AlarmChannelId,
+            context.getString(R.string.notifications_channel_maintenance_name),
+            NotificationManager.IMPORTANCE_MIN,
+        )
+
+        alarmChannel.setSound(null, null)
+        maintenanceChannel.setSound(null, null)
+
+        notificationManager.createNotificationChannel(alarmChannel)
+        notificationManager.createNotificationChannel(maintenanceChannel)
     }
 }
