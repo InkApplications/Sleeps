@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -30,9 +29,8 @@ internal class LocationSunriseAccess(
     private val refresh = MutableStateFlow(0)
 
     override val nextSunrise = locationAccess.locationUpdates
-        .combine(refresh) { location, _ -> location }
-        .map { location -> createState(location) }
-        .onEach { scheduleRefresh(it) }
+        .combine(refresh) { location, _ -> createState(location) }
+        .onEach(::scheduleRefresh)
 
     private fun createState(location: LocationState): Sunrise {
         return when (location) {
@@ -45,9 +43,9 @@ internal class LocationSunriseAccess(
         }
     }
 
-    private fun scheduleRefresh(sunriseState: Sunrise) {
+    private fun scheduleRefresh(sunrise: Sunrise) {
         stateScope.launch {
-            delay(sunriseState.timestamp.instant - clock.now())
+            delay(sunrise.timestamp.instant - clock.now())
             refresh.value++
         }
     }

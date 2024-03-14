@@ -30,7 +30,7 @@ class AlarmService: Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         when (intent.action) {
             StartAction -> start(intent.alarmId)
-            StopAction -> stopSelf()
+            StopAction -> stop()
             else -> Kimchi.error("Unknown Alarm Service Action: ${intent.action}")
         }
 
@@ -44,6 +44,11 @@ class AlarmService: Service() {
             beeper.prepare()
             alarmExecutor.onStartAlarm(alarm)
         }
+    }
+
+    private fun stop() {
+        Kimchi.info("Stopping Service")
+        stopSelf()
     }
 
     override fun onDestroy() {

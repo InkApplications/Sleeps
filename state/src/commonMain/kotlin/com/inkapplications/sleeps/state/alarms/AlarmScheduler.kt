@@ -1,6 +1,5 @@
 package com.inkapplications.sleeps.state.alarms
 
-import com.inkapplications.sleeps.state.DeviceBootController
 import com.inkapplications.sleeps.state.notifications.NotificationSettings
 import com.inkapplications.sleeps.state.notifications.NotificationSettingsAccess
 import com.inkapplications.sleeps.state.schedule.Schedule
@@ -9,7 +8,6 @@ import kimchi.logger.KimchiLogger
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import regolith.processes.daemon.Daemon
 import regolith.processes.daemon.DaemonRunAttempt
@@ -24,17 +22,11 @@ internal class AlarmScheduler(
     scheduleAccess: ScheduleAccess,
     private val clock: Clock,
     private val logger: KimchiLogger,
-): Daemon, DeviceBootController {
+): Daemon, MaintenanceController {
     private val alarmParameters = combine(
         scheduleAccess.schedule,
         notificationSettings.notificationsState,
     ) { sunSchedule, settings -> AlarmParameters(sunSchedule, settings) }
-
-    override fun onDeviceBoot() {
-        runBlocking {
-            scheduleAlarm(alarmParameters.first())
-        }
-    }
 
     override suspend fun startDaemon(): Nothing {
         alarmParameters.collectLatest { parameters ->
@@ -46,7 +38,6 @@ internal class AlarmScheduler(
 
     private fun scheduleAlarm(alarmParameters: AlarmParameters) {
         logger.trace("Removing all alarms")
-
         if (alarmParameters.settings.wakeAlarm) {
             logger.trace("Scheduling Wake alarm for ${alarmParameters.schedule.wake}")
             alarmAccess.addAlarm(AlarmType.Wake, alarmParameters.schedule.wake.instant)
@@ -74,4 +65,8 @@ internal class AlarmScheduler(
         val schedule: Schedule,
         val settings: NotificationSettings,
     )
+
+    override suspend fun performMaintenance() {
+        scheduleAlarm(alarmParameters.first())
+    }
 }

@@ -9,6 +9,7 @@ import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.inkapplications.sleeps.android.alarms.AlarmBeeper
 import com.inkapplications.sleeps.android.alarms.AlarmNotifications
 import com.inkapplications.sleeps.android.alarms.AndroidAlarmAccess
+import com.inkapplications.sleeps.android.maintenance.AndroidMaintenanceScheduler
 import com.inkapplications.sleeps.state.createJvmStateModule
 import com.inkapplications.sleeps.state.settings.Settings
 import kimchi.logger.defaultWriter
@@ -38,9 +39,10 @@ class ApplicationModule(
                 .build(),
         ),
     )
+    val alarmManager = application.getSystemService(Activity.ALARM_SERVICE) as AlarmManager
     val alarmAccess = AndroidAlarmAccess(
         context = application,
-        alarmManager = application.getSystemService(Activity.ALARM_SERVICE) as AlarmManager,
+        alarmManager = alarmManager,
     )
     val notifications = AlarmNotifications(
         context = application,
@@ -52,6 +54,10 @@ class ApplicationModule(
         locationAccess = locationAccess,
         alarmAccess = alarmAccess,
         beeper = beeper,
+        maintenanceScheduler = AndroidMaintenanceScheduler(
+            alarmManager = alarmManager,
+            context = application,
+        ),
         initializers = listOf(
             notifications,
         ),
@@ -64,4 +70,5 @@ class ApplicationModule(
     val initRunner = stateModule.init
     val alarmExecutor = stateModule.alarmController
     val bootController = stateModule.bootController
+    val maintenanceController = stateModule.maintenanceController
 }

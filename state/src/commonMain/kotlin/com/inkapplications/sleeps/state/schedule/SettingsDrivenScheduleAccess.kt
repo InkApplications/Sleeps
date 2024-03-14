@@ -4,6 +4,7 @@ import com.inkapplications.sleeps.state.notifications.NotificationSettingsAccess
 import com.inkapplications.sleeps.state.sun.SunriseAccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 
 internal class SettingsDrivenScheduleAccess(
     sunriseAccess: SunriseAccess,
