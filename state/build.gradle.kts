@@ -1,15 +1,5 @@
 plugins {
     id("library")
-    id("app.cash.sqldelight")
-}
-
-sqldelight {
-    databases {
-        create("Settings") {
-            packageName.set("com.inkapplications.sleeps.state.settings")
-            schemaOutputDirectory.set(file("src/commonMain/sqldelight/databases"))
-        }
-    }
 }
 
 kotlin {
@@ -18,7 +8,6 @@ kotlin {
             dependencies {
                 implementation(libs.coroutines.core)
                 implementation(libs.regolith.processes)
-                implementation(libs.sqldelight.coroutines)
                 api(libs.regolith.init)
                 api(libs.regolith.sensors)
                 api(libs.ui.structures)
@@ -26,6 +15,8 @@ kotlin {
                 api(libs.watermelon.datetime)
                 api(libs.kimchi.core)
                 api(libs.kotlinx.datetime)
+                implementation(libs.regolith.data)
+                implementation(libs.watermelon.data)
             }
         }
 

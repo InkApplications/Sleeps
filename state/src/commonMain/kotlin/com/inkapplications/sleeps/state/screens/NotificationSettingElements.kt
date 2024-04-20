@@ -39,15 +39,15 @@ internal object NotificationSettingElements {
         val alarm = createToggleRow(
             text = "Enable",
             checked = state.wakeAlarm,
-            onClick = notificationController::onWakeAlarmClick,
+            onClick = { notificationController.onWakeAlarmClick(state.wakeAlarm) },
         )
         val wakeMargin = MenuRowElement(
             text = "Margin (hours)",
             rightElement = SpinnerElement(
                 value = state.alarmMargin.format(),
                 hasPreviousValue = state.alarmMargin.isPositive(),
-                onNextValue = notificationController::onIncreaseWakeAlarmMargin,
-                onPreviousValue = notificationController::onDecreaseWakeAlarmMargin.takeIf { state.alarmMargin.isPositive() } ?: {},
+                onNextValue = { notificationController.onIncreaseWakeAlarmMargin(state.alarmMargin) },
+                onPreviousValue = { notificationController.onDecreaseWakeAlarmMargin(state.alarmMargin) },
             )
         )
 
@@ -72,15 +72,15 @@ internal object NotificationSettingElements {
         val sleepNotifications = createToggleRow(
             text = "Enable",
             checked = state.sleepNotifications,
-            onClick = notificationController::onSleepNotificationClick,
+            onClick = { notificationController.onSleepNotificationClick(state.sleepNotifications) }
         )
         val sleepTarget = MenuRowElement(
             text = "Sleep Target (hours)",
             rightElement = SpinnerElement(
                 value = state.sleepTarget.format(),
                 hasPreviousValue = state.sleepTarget.isPositive(),
-                onNextValue = notificationController::onIncreaseSleepTarget,
-                onPreviousValue = notificationController::onDecreaseSleepTarget.takeIf { state.sleepTarget.isPositive() } ?: {},
+                onNextValue = { notificationController.onIncreaseSleepTarget(state.sleepTarget) },
+                onPreviousValue = { notificationController.onDecreaseSleepTarget(state.sleepTarget) },
             )
         )
         val sleepMargin = MenuRowElement(
@@ -88,8 +88,8 @@ internal object NotificationSettingElements {
             rightElement = SpinnerElement(
                 value = state.sleepMargin.format(),
                 hasPreviousValue = state.sleepMargin.isPositive(),
-                onNextValue = notificationController::onIncreaseSleepAlarmMargin,
-                onPreviousValue = notificationController::onDecreaseSleepAlarmMargin.takeIf { state.sleepMargin.isPositive() } ?: {},
+                onNextValue = { notificationController.onIncreaseSleepAlarmMargin(state.sleepMargin) },
+                onPreviousValue = { notificationController.onDecreaseSleepAlarmMargin(state.sleepMargin) },
             )
         )
 

@@ -5,10 +5,9 @@ core-ktx = "1.12.0"
 lifecycle-runtime-ktx = "2.7.0"
 activity-compose = "1.8.2"
 compose-bom = "2024.03.00"
-regolith = "1.2.1"
+regolith = "1.3.0"
 ink-ui = "0.3.1"
 watermelon = "1.5.0"
-sqldelight = "2.0.1"
 
 ##
 # Kotlin Dependencies
@@ -99,6 +98,10 @@ module = "com.inkapplications.regolith:resources"
 version.ref = "regolith"
 module = "com.inkapplications.regolith:sensors"
 
+[libraries.regolith-data]
+version.ref = "regolith"
+module = "com.inkapplications.regolith:data"
+
 [libraries.ui-structures]
 version.ref = "ink-ui"
 module = "com.inkapplications.ui:structures"
@@ -119,24 +122,16 @@ module = "com.inkapplications.watermelon:datetime"
 version.ref = "watermelon"
 module = "com.inkapplications.watermelon:android"
 
+[libraries.watermelon-data]
+version.ref = "watermelon"
+module = "com.inkapplications.watermelon:data"
+
 ##
 # Other/Thirdparty
 ##
 [libraries.sunrisesunsetcalculator]
 version = "1.2"
 module = "com.luckycatlabs:SunriseSunsetCalculator"
-
-[libraries.sqldelight-gradle]
-version.ref = "sqldelight"
-module = "app.cash.sqldelight:app.cash.sqldelight.gradle.plugin"
-
-[libraries.sqldelight-coroutines]
-version.ref = "sqldelight"
-module = "app.cash.sqldelight:coroutines-extensions"
-
-[libraries.sqldelight-android]
-version.ref = "sqldelight"
-module = "app.cash.sqldelight:android-driver"
 
 [bundles]
 regolith = ["regolith-init", "regolith-processes", "regolith-resources", "regolith-sensors"]

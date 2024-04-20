@@ -1,6 +1,5 @@
 package com.inkapplications.sleeps.state
 
-import app.cash.sqldelight.db.SqlDriver
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.alarms.AlarmAccess
 import com.inkapplications.sleeps.state.alarms.AlarmBeeper
@@ -9,6 +8,7 @@ import com.inkapplications.sleeps.state.sun.JvmSunScheduleProvider
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import regolith.data.settings.SettingsAccess
 import regolith.init.Initializer
 import regolith.sensors.location.LocationAccess
 
@@ -21,7 +21,7 @@ fun createJvmStateModule(
     beeper: AlarmBeeper,
     maintenanceScheduler: MaintenanceScheduler,
     alarmAccess: AlarmAccess,
-    settingsDriver: SqlDriver,
+    settingsAccess: SettingsAccess,
     initializers: List<Initializer> = emptyList(),
     stateScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     clock: ZonedClock = ZonedClock.System,
@@ -34,6 +34,6 @@ fun createJvmStateModule(
     logWriter = logWriter,
     beeper = beeper,
     maintenanceScheduler = maintenanceScheduler,
-    settingsDriver = settingsDriver,
+    settingsAccess = settingsAccess,
     initializers = initializers,
 )

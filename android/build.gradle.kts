@@ -72,9 +72,9 @@ dependencies {
     implementation(libs.bundles.androidx)
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
-    implementation(libs.sqldelight.android)
     implementation(libs.ui.compose)
     implementation(libs.watermelon.android)
     implementation(libs.kimchi.core)
     implementation(projects.state)
+    implementation(libs.regolith.data)
 }
