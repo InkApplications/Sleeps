@@ -1,12 +1,14 @@
 package com.inkapplications.sleeps.state.notifications
 
+import kotlin.time.Duration
+
 object NotificationControllerStub: NotificationController {
-    override fun onSleepNotificationClick() {}
-    override fun onWakeAlarmClick() {}
-    override fun onIncreaseWakeAlarmMargin() {}
-    override fun onDecreaseWakeAlarmMargin() {}
-    override fun onIncreaseSleepAlarmMargin() {}
-    override fun onDecreaseSleepAlarmMargin() {}
-    override fun onIncreaseSleepTarget() {}
-    override fun onDecreaseSleepTarget() {}
+    override fun onSleepNotificationClick(currentState: Boolean) {}
+    override fun onWakeAlarmClick(currentState: Boolean) {}
+    override fun onIncreaseWakeAlarmMargin(currentState: Duration) {}
+    override fun onDecreaseWakeAlarmMargin(currentState: Duration) {}
+    override fun onIncreaseSleepAlarmMargin(currentState: Duration) {}
+    override fun onDecreaseSleepAlarmMargin(currentState: Duration) {}
+    override fun onIncreaseSleepTarget(currentState: Duration) {}
+    override fun onDecreaseSleepTarget(currentState: Duration) {}
 }

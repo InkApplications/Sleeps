@@ -8,15 +8,13 @@ import com.inkapplications.sleeps.state.schedule.SettingsDrivenScheduleAccess
 import com.inkapplications.sleeps.state.screens.ScreenLayoutFactory
 import com.inkapplications.sleeps.state.screens.ScreenState
 import com.inkapplications.sleeps.state.screens.ScreenStateProvider
-import com.inkapplications.sleeps.state.settings.AlarmSettings
-import com.inkapplications.sleeps.state.settings.MinutesDurationAdapter
-import com.inkapplications.sleeps.state.settings.Settings
 import com.inkapplications.sleeps.state.sun.LocationSunriseAccess
 import com.inkapplications.sleeps.state.sun.SunScheduleProvider
 import kimchi.Kimchi
 import kimchi.logger.LogWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import regolith.data.settings.SettingsAccess
 import regolith.init.Initializer
 import regolith.init.RegolithInitRunner
 import regolith.processes.daemon.DaemonInitializer
@@ -30,7 +28,7 @@ class StateModule(
     maintenanceScheduler: MaintenanceScheduler,
     logWriter: LogWriter,
     initializers: List<Initializer>,
-    settingsDriver: SqlDriver,
+    settingsAccess: SettingsAccess,
     stateScope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     clock: ZonedClock = ZonedClock.System,
 ) {
@@ -42,17 +40,10 @@ class StateModule(
         locationAccess = locationAccess,
     )
 
-    private val settingsDatabase = Settings(
-        driver = settingsDriver,
-        AlarmSettingsAdapter = AlarmSettings.Adapter(
-            alarm_marginAdapter = MinutesDurationAdapter,
-            sleep_targetAdapter = MinutesDurationAdapter,
-            sleep_marginAdapter = MinutesDurationAdapter,
-        )
-    )
-
     private val notificationStateAccess = DatabaseNotificationSettingsAccess(
-        alarmSettings = settingsDatabase.alarmSettingsQueries,
+        settingsAccess = settingsAccess,
+        writeScope = stateScope,
+        logger = kimchi,
     )
 
     private val screenLayoutFactory = ScreenLayoutFactory()
