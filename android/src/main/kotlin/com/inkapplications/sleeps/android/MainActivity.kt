@@ -1,6 +1,6 @@
 package com.inkapplications.sleeps.android
 
-import android.Manifest
+import android.Manifest.permission.*
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -13,9 +13,10 @@ import ink.ui.render.compose.ComposeRenderer
 
 private const val EditAlarmIntentId = 13987
 private val Permissions = arrayOf(
-    Manifest.permission.ACCESS_COARSE_LOCATION,
-    Manifest.permission.POST_NOTIFICATIONS,
-    Manifest.permission.SCHEDULE_EXACT_ALARM,
+    ACCESS_COARSE_LOCATION,
+    POST_NOTIFICATIONS,
+    SCHEDULE_EXACT_ALARM,
+    FOREGROUND_SERVICE_LOCATION
 )
 
 class MainActivity: ComponentActivity() {
