@@ -1,18 +1,20 @@
 package com.inkapplications.sleeps.state.schedule
 
-import com.inkapplications.sleeps.state.notifications.NotificationSettingsAccess
+import com.inkapplications.sleeps.state.notifications.NotificationSettings
+import com.inkapplications.sleeps.state.notifications.combineNotificationState
 import com.inkapplications.sleeps.state.sun.SunriseAccess
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
+import regolith.data.settings.SettingsAccess
 
 internal class SettingsDrivenScheduleAccess(
     sunriseAccess: SunriseAccess,
-    notificationSettings: NotificationSettingsAccess,
+    settingsAccess: SettingsAccess,
+    notificationSettings: NotificationSettings,
 ): ScheduleAccess {
     override val schedule: Flow<Schedule> = combine(
         sunriseAccess.nextSunrise,
-        notificationSettings.notificationsState,
+        settingsAccess.combineNotificationState(notificationSettings),
     ) { sunriseState, settings ->
         Schedule(
             sunrise = sunriseState.timestamp,

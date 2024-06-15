@@ -16,7 +16,7 @@ internal class BeepingAlarmController(
     override suspend fun onStartAlarm(id: AlarmType) {
         var current = initialDelay
         while (currentCoroutineContext().isActive) {
-            beeper.play()
+            beeper.beep()
             delay(current)
             current = (current * acceleration).coerceAtLeast(minimumDelay)
         }

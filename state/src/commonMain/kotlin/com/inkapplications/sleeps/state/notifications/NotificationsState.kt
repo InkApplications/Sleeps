@@ -5,7 +5,7 @@ import kotlin.time.Duration
 /**
  * Current notification and alarm settings.
  */
-data class NotificationSettings(
+internal data class NotificationSettingsState(
     val sleepNotifications: Boolean,
     val wakeAlarm: Boolean,
     val alarmMargin: Duration,

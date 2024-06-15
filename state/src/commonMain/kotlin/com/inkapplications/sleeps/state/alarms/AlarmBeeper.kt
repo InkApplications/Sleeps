@@ -7,5 +7,5 @@ interface AlarmBeeper {
     /**
      * Play a single loop of the alarm sound.
      */
-    suspend fun play()
+    suspend fun beep()
 }

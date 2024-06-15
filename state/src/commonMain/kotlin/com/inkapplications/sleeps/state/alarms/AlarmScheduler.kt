@@ -1,7 +1,8 @@
 package com.inkapplications.sleeps.state.alarms
 
 import com.inkapplications.sleeps.state.notifications.NotificationSettings
-import com.inkapplications.sleeps.state.notifications.NotificationSettingsAccess
+import com.inkapplications.sleeps.state.notifications.NotificationSettingsState
+import com.inkapplications.sleeps.state.notifications.combineNotificationState
 import com.inkapplications.sleeps.state.schedule.Schedule
 import com.inkapplications.sleeps.state.schedule.ScheduleAccess
 import kimchi.logger.KimchiLogger
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
+import regolith.data.settings.SettingsAccess
 import regolith.processes.daemon.Daemon
 import regolith.processes.daemon.DaemonRunAttempt
 import regolith.processes.daemon.FailureSignal
@@ -18,14 +20,15 @@ import regolith.processes.daemon.FailureSignal
  */
 internal class AlarmScheduler(
     private val alarmAccess: AlarmAccess,
-    notificationSettings: NotificationSettingsAccess,
+    notificationSettings: NotificationSettings,
+    settingsAccess: SettingsAccess,
     scheduleAccess: ScheduleAccess,
     private val clock: Clock,
     private val logger: KimchiLogger,
 ): Daemon, MaintenanceController {
     private val alarmParameters = combine(
         scheduleAccess.schedule,
-        notificationSettings.notificationsState,
+        settingsAccess.combineNotificationState(notificationSettings),
     ) { sunSchedule, settings -> AlarmParameters(sunSchedule, settings) }
 
     override suspend fun startDaemon(): Nothing {
@@ -63,7 +66,7 @@ internal class AlarmScheduler(
      */
     private data class AlarmParameters(
         val schedule: Schedule,
-        val settings: NotificationSettings,
+        val settings: NotificationSettingsState,
     )
 
     override suspend fun performMaintenance() {

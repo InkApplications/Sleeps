@@ -1,11 +1,13 @@
 package com.inkapplications.sleeps.state.alarms
 
 import com.inkapplications.datetime.atZone
+import com.inkapplications.sleeps.doubles.SettingsAccessDummy
 import com.inkapplications.sleeps.state.notifications.NotificationSettings
-import com.inkapplications.sleeps.state.notifications.NotificationSettingsFake
 import com.inkapplications.sleeps.state.schedule.Schedule
 import com.inkapplications.sleeps.state.schedule.ScheduleAccessFake
 import kimchi.logger.EmptyLogger
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -13,31 +15,26 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import regolith.data.settings.SettingsAccess
+import regolith.data.settings.structure.PrimitiveSetting
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.time.Duration.Companion.INFINITE
 
 class AlarmSchedulerTest {
-    private val fakeConfig = NotificationSettings(
-        sleepNotifications = true,
-        wakeAlarm = true,
-        alarmMargin = INFINITE,
-        sleepMargin = INFINITE,
-        sleepTarget = INFINITE,
-    )
     private val fakeSchedule = Schedule(
         sunrise = LocalDateTime(2021, 1, 2, 6, 0).atZone(TimeZone.UTC),
         wake = LocalDateTime(2021, 1, 2, 7, 1).atZone(TimeZone.UTC),
         sleep = LocalDateTime(2021, 1, 1, 20, 2).atZone(TimeZone.UTC),
     )
-    val afternoonBefore = object: Clock {
+    private val afternoonBefore = object: Clock {
         override fun now(): Instant  = LocalDateTime(2021, 1, 1, 20, 0).atZone(TimeZone.UTC).instant
     }
+    private val notificationSettings = NotificationSettings()
 
     @Test
     fun alarmSchedule() = runTest {
-        val notificationSettings = NotificationSettingsFake()
         val fakeScheduleAccess = ScheduleAccessFake()
         val alarmAccess = AlarmAccessSpy()
         val alarmScheduler = AlarmScheduler(
@@ -45,6 +42,18 @@ class AlarmSchedulerTest {
             scheduleAccess = fakeScheduleAccess,
             notificationSettings = notificationSettings,
             clock = afternoonBefore,
+            settingsAccess = object: SettingsAccess by SettingsAccessDummy {
+                override fun <STORED> observeSetting(setting: PrimitiveSetting<STORED>): Flow<STORED> {
+                    return when (setting.key) {
+                        notificationSettings.sleepAlarmSetting.key -> flow { emit(1L) }
+                        notificationSettings.wakeAlarmSetting.key -> flow { emit(1L) }
+                        notificationSettings.alarmMarginSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        notificationSettings.sleepMarginSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        notificationSettings.sleepTargetSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        else -> error("Unexpected setting: ${setting.key}")
+                    } as Flow<STORED>
+                }
+            },
             logger = EmptyLogger
         )
 
@@ -57,7 +66,6 @@ class AlarmSchedulerTest {
         assertEquals(0, alarmAccess.addCalls.size, "No calls before schedule is updated")
         assertEquals(0, alarmAccess.clearCalls.size, "No calls before schedule is updated")
 
-        notificationSettings.notificationsState.emit(fakeConfig)
         fakeScheduleAccess.schedule.emit(fakeSchedule)
         runCurrent()
 
@@ -85,13 +93,24 @@ class AlarmSchedulerTest {
 
     @Test
     fun alarmsDisabled() = runTest {
-        val notificationsFake = NotificationSettingsFake()
         val fakeScheduleAccess = ScheduleAccessFake()
         val alarmAccess = AlarmAccessSpy()
         val alarmScheduler = AlarmScheduler(
             alarmAccess = alarmAccess,
             scheduleAccess = fakeScheduleAccess,
-            notificationSettings = notificationsFake,
+            notificationSettings = notificationSettings,
+            settingsAccess = object: SettingsAccess by SettingsAccessDummy {
+                override fun <STORED> observeSetting(setting: PrimitiveSetting<STORED>): Flow<STORED> {
+                    return when (setting.key) {
+                        notificationSettings.sleepAlarmSetting.key -> flow { emit(0L) }
+                        notificationSettings.wakeAlarmSetting.key -> flow { emit(0L) }
+                        notificationSettings.alarmMarginSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        notificationSettings.sleepMarginSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        notificationSettings.sleepTargetSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        else -> error("Unexpected setting: ${setting.key}")
+                    } as Flow<STORED>
+                }
+            },
             clock = afternoonBefore,
             logger = EmptyLogger,
         )
@@ -101,10 +120,6 @@ class AlarmSchedulerTest {
         }
 
         runCurrent()
-        notificationsFake.notificationsState.emit(fakeConfig.copy(
-            sleepNotifications = false,
-            wakeAlarm = false,
-        ))
         fakeScheduleAccess.schedule.emit(fakeSchedule)
         runCurrent()
 
@@ -118,13 +133,24 @@ class AlarmSchedulerTest {
 
     @Test
     fun midCycle() = runTest {
-        val notificationSettings = NotificationSettingsFake()
         val fakeScheduleAccess = ScheduleAccessFake()
         val alarmAccess = AlarmAccessSpy()
         val alarmScheduler = AlarmScheduler(
             alarmAccess = alarmAccess,
             scheduleAccess = fakeScheduleAccess,
             notificationSettings = notificationSettings,
+            settingsAccess = object: SettingsAccess by SettingsAccessDummy {
+                override fun <STORED> observeSetting(setting: PrimitiveSetting<STORED>): Flow<STORED> {
+                    return when (setting.key) {
+                        notificationSettings.sleepAlarmSetting.key -> flow { emit(1L) }
+                        notificationSettings.wakeAlarmSetting.key -> flow { emit(1L) }
+                        notificationSettings.alarmMarginSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        notificationSettings.sleepMarginSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        notificationSettings.sleepTargetSetting.key -> flow { emit(INFINITE.inWholeMinutes) }
+                        else -> error("Unexpected setting: ${setting.key}")
+                    } as Flow<STORED>
+                }
+            },
             clock = object: Clock {
                 override fun now(): Instant  = LocalDateTime(2021, 1, 1, 21, 2).atZone(TimeZone.UTC).instant
             },
@@ -140,7 +166,6 @@ class AlarmSchedulerTest {
         assertEquals(0, alarmAccess.addCalls.size, "No calls before schedule is updated")
         assertEquals(0, alarmAccess.clearCalls.size, "No calls before schedule is updated")
 
-        notificationSettings.notificationsState.emit(fakeConfig)
         fakeScheduleAccess.schedule.emit(fakeSchedule)
         runCurrent()
 
