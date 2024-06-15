@@ -1,9 +1,8 @@
 package com.inkapplications.sleeps.state
 
-import app.cash.sqldelight.db.SqlDriver
 import com.inkapplications.datetime.ZonedClock
 import com.inkapplications.sleeps.state.alarms.*
-import com.inkapplications.sleeps.state.notifications.DatabaseNotificationSettingsAccess
+import com.inkapplications.sleeps.state.notifications.NotificationSettings
 import com.inkapplications.sleeps.state.schedule.SettingsDrivenScheduleAccess
 import com.inkapplications.sleeps.state.screens.ScreenLayoutFactory
 import com.inkapplications.sleeps.state.screens.ScreenState
@@ -40,31 +39,28 @@ class StateModule(
         locationAccess = locationAccess,
     )
 
-    private val notificationStateAccess = DatabaseNotificationSettingsAccess(
-        settingsAccess = settingsAccess,
-        writeScope = stateScope,
-        logger = kimchi,
-    )
-
+    private val notificationSettings = NotificationSettings()
     private val screenLayoutFactory = ScreenLayoutFactory()
 
     private val scheduleAccess = SettingsDrivenScheduleAccess(
         sunriseAccess = sunriseAccess,
-        notificationSettings = notificationStateAccess,
+        notificationSettings = notificationSettings,
+        settingsAccess = settingsAccess,
     )
 
     val screenProvider: ScreenState = ScreenStateProvider(
-        notificationSettingsAccess = notificationStateAccess,
-        notificationController = notificationStateAccess,
         screenLayoutFactory = screenLayoutFactory,
         scheduleAccess = scheduleAccess,
+        settings = notificationSettings.settings,
+        settingsAccess = settingsAccess,
         stateScope = stateScope,
     )
 
     private val alarmScheduler = AlarmScheduler(
         alarmAccess = alarmAccess,
         scheduleAccess = scheduleAccess,
-        notificationSettings = notificationStateAccess,
+        notificationSettings = notificationSettings,
+        settingsAccess = settingsAccess,
         clock = clock,
         logger = kimchi,
     )

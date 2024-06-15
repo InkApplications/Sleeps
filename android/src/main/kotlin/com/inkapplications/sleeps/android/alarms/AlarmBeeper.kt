@@ -23,26 +23,26 @@ class AlarmBeeper(
         Kimchi.trace("Preparing MediaPlayer")
         if (mediaPlayer != null) release()
 
-        suspendCoroutine { continuation ->
-            val attributes = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
-            mediaPlayer = MediaPlayer.create(
-                context,
-                R.raw.alarm,
-                attributes,
-                audioManager.generateAudioSessionId()
-            ).apply {
-                setOnPreparedListener {
-                    Kimchi.trace("MediaPlayer Prepared")
-                    continuation.resume(Unit)
-                }
-            }
+        val attributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        mediaPlayer = MediaPlayer.create(
+            context,
+            R.raw.alarm,
+            attributes,
+            audioManager.generateAudioSessionId()
+        ).awaitPrepare()
+    }
+
+    private suspend fun MediaPlayer.awaitPrepare(): MediaPlayer {
+        return suspendCoroutine { continuation ->
+            Kimchi.trace("MediaPlayer Prepared")
+            setOnPreparedListener { continuation.resume(this) }
         }
     }
 
-    override suspend fun play() {
+    override suspend fun beep() {
         if (mediaPlayer?.isPlaying == false) {
             Kimchi.trace("Starting Alarm Beep")
             mediaPlayer?.start()
@@ -54,5 +54,6 @@ class AlarmBeeper(
     fun release() {
         Kimchi.trace("Releasing Alarm MediaPlayer")
         mediaPlayer?.release()
+        mediaPlayer = null
     }
 }
