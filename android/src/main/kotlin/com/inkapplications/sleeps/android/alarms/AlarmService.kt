@@ -10,7 +10,9 @@ import com.inkapplications.sleeps.android.SleepApplication
 import com.inkapplications.sleeps.state.alarms.AlarmType
 import kimchi.Kimchi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 private const val NotificationId = 3893
 private const val StopServiceIntentId = 28759
@@ -48,6 +50,8 @@ class AlarmService: Service() {
         startForeground(NotificationId, notifications.createAlarmNotification())
         job = backgroundScope.launch {
             beeper.prepare()
+            // Allow some time for android to post the notification to post before starting the alarm.
+            delay(10.seconds)
             alarmExecutor.onStartAlarm(alarm)
         }
     }
