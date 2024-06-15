@@ -16,7 +16,7 @@ private val Permissions = arrayOf(
     ACCESS_COARSE_LOCATION,
     POST_NOTIFICATIONS,
     SCHEDULE_EXACT_ALARM,
-    FOREGROUND_SERVICE_LOCATION
+    FOREGROUND_SERVICE_LOCATION,
 )
 
 class MainActivity: ComponentActivity() {

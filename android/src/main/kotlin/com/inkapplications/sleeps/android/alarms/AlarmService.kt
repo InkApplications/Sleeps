@@ -5,6 +5,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.os.PowerManager
 import com.inkapplications.sleeps.android.SleepApplication
 import com.inkapplications.sleeps.state.alarms.AlarmType
 import kimchi.Kimchi
@@ -22,6 +23,7 @@ private const val AlarmIdExtra = "alarm.id"
  */
 class AlarmService: Service() {
     private var job: Job? = Job()
+    private var wakeLock: PowerManager.WakeLock? = null
 
     private val Intent.alarmId get() = getStringExtra(AlarmIdExtra).let(AlarmType::findById)
 
@@ -39,6 +41,10 @@ class AlarmService: Service() {
 
     private fun start(alarm: AlarmType) = with (SleepApplication.module) {
         job?.cancel()
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            this::class.simpleName,
+        ).apply { acquire() }
         startForeground(NotificationId, notifications.createAlarmNotification())
         job = backgroundScope.launch {
             beeper.prepare()
@@ -52,6 +58,7 @@ class AlarmService: Service() {
     }
 
     override fun onDestroy() {
+        wakeLock?.release()
         job?.cancel()
         SleepApplication.module.beeper.release()
         super.onDestroy()
