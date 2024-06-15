@@ -3,7 +3,9 @@ package com.inkapplications.sleeps.android
 import android.app.Activity
 import android.app.AlarmManager
 import android.app.Application
+import android.content.Context
 import android.location.LocationManager
+import android.os.PowerManager
 import androidx.core.location.LocationRequestCompat
 import com.inkapplications.sleeps.android.alarms.AlarmBeeper
 import com.inkapplications.sleeps.android.alarms.AlarmNotifications
@@ -28,6 +30,7 @@ class ApplicationModule(
 ) {
     val backgroundScope = CoroutineScope(Dispatchers.Default)
     val beeper = AlarmBeeper(application)
+    val powerManager = application.getSystemService(Context.POWER_SERVICE) as PowerManager
     val locationAccess = AndroidLocationAccess(
         locationManager = application.getSystemService(Activity.LOCATION_SERVICE) as LocationManager,
         context = application,

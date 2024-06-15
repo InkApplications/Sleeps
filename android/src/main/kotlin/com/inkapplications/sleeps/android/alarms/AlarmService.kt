@@ -5,11 +5,14 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.os.PowerManager
 import com.inkapplications.sleeps.android.SleepApplication
 import com.inkapplications.sleeps.state.alarms.AlarmType
 import kimchi.Kimchi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 private const val NotificationId = 3893
 private const val StopServiceIntentId = 28759
@@ -22,6 +25,7 @@ private const val AlarmIdExtra = "alarm.id"
  */
 class AlarmService: Service() {
     private var job: Job? = Job()
+    private var wakeLock: PowerManager.WakeLock? = null
 
     private val Intent.alarmId get() = getStringExtra(AlarmIdExtra).let(AlarmType::findById)
 
@@ -39,9 +43,15 @@ class AlarmService: Service() {
 
     private fun start(alarm: AlarmType) = with (SleepApplication.module) {
         job?.cancel()
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            this::class.simpleName,
+        ).apply { acquire() }
         startForeground(NotificationId, notifications.createAlarmNotification())
         job = backgroundScope.launch {
             beeper.prepare()
+            // Allow some time for android to post the notification to post before starting the alarm.
+            delay(10.seconds)
             alarmExecutor.onStartAlarm(alarm)
         }
     }
@@ -52,6 +62,7 @@ class AlarmService: Service() {
     }
 
     override fun onDestroy() {
+        wakeLock?.release()
         job?.cancel()
         SleepApplication.module.beeper.release()
         super.onDestroy()
