@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.22"
-coroutines = "1.8.1"
+coroutines = "1.9.0"
 core-ktx = "1.13.1"
 lifecycle-runtime-ktx = "2.8.6"
 activity-compose = "1.9.2"
