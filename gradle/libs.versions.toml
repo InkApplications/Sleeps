@@ -6,7 +6,7 @@ lifecycle-runtime-ktx = "2.8.7"
 activity-compose = "1.9.3"
 compose-bom = "2025.01.00"
 regolith = "1.6.0"
-ink-ui = "0.3.3"
+ink-ui = "1.0.0"
 watermelon = "1.7.0"
 
 ##
